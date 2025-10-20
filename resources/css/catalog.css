@@ -1,0 +1,109 @@
+:root {
+    --color-sakura: #FF6B81; 
+    --color-sky: #48DBFB; 
+    --color-cta: #FFB347; 
+    --color-dark: #333333;
+    --color-neutral: #F7F7F7;
+    --min-price-filter: 20; 
+    --max-price-filter: 1000;
+}
+
+body { 
+    font-family: 'Poppins', sans-serif; 
+    color: var(--color-dark); 
+    background-color: var(--color-neutral); 
+}
+h1, h2, h3, h4 { 
+    font-family: 'Fredoka', sans-serif; 
+    color: var(--color-dark); 
+}
+.shadow-soft { 
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.05); 
+}
+.card-radius { 
+    border-radius: 12px; 
+}
+.transition-default { 
+    transition: all 0.3s ease; 
+}
+.filter-btn { 
+    background-color: white; 
+    border: 1px solid #e5e7eb; 
+}
+.filter-btn.selected { 
+    background-color: var(--color-sakura); 
+    color: white; 
+    font-weight: 700; 
+}
+.price-range-display { 
+    font-family: 'Fredoka', sans-serif; 
+    font-weight: bold; 
+    color: var(--color-sakura); 
+}
+input[type="text"] { 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    width: 100%; 
+}
+
+.range-container {
+    position: relative;
+    height: 48px; 
+    padding-top: 10px;
+}
+.range-slider-base {
+    position: absolute;
+    width: 100%;
+    height: 8px;
+    background: #E5E7EB; 
+    border-radius: 4px;
+    pointer-events: none;
+}
+.range-progress {
+    position: absolute;
+    height: 8px;
+    border-radius: 4px;
+    background: var(--color-sky); 
+    pointer-events: none;
+    transition: left 0.1s ease, width 0.1s ease;
+}
+.range-input {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: none;
+    -webkit-appearance: none;
+    pointer-events: none;
+}
+.range-input::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 18px; height: 18px; background: var(--color-sakura); 
+    border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 3px rgba(255, 107, 129, 0.4); pointer-events: all;
+}
+.range-input::-moz-range-thumb {
+    width: 18px; height: 18px; background: var(--color-sakura); border-radius: 50%; cursor: pointer; 
+    border: none; box-shadow: 0 0 0 3px rgba(255, 107, 129, 0.4); pointer-events: all;
+}
+
+.shadow-sakura-outline {
+    box-shadow: 0 0 0 4px var(--color-sakura), 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.main-content-wrapper {
+    height: calc(100vh - 160px); 
+    overflow: hidden; 
+    display: flex;
+}
+.scrollable-grid {
+    overflow-y: auto; 
+    padding-right: 1.5rem;
+}
+.sticky-filter {
+    height: 100%; 
+    overflow-y: hidden;
+}
+.nav-active {
+    color: var(--color-sakura) !important;
+    border-bottom: 2px solid var(--color-sakura);
+    font-weight: 700;
+}

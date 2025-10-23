@@ -1,6 +1,5 @@
 <x-layout>
     @php
-        $products = [];
         $categories = [
             ['name' => 'Fashion Accessories', 'tag' => 'fashion-accessories'],
             ['name' => 'Collectibles', 'tag' => 'collectibles'],
@@ -9,38 +8,66 @@
         ];
         $base_price_min = 22;
         $base_price_max = 999;
+        $products = [];
 
-        for ($i = 1; $i <= 50; $i++) {
-            $category_data = $categories[array_rand($categories)];
-            $price = round(rand($base_price_min, $base_price_max) / 10) * 10;
-            
-            if ($i === 1) {
-                $imagePath = 'catalog-assets/jjkBagcharm.jpeg'; 
-                $name = 'JJK (JUJUTSU KAISEN) BAGCHARMS';
-                $category = 'Luggage & Bags';
-                $price = 180.00;
-                $productCategoryTag = 'luggage-bags';
+        // Specific JJK Products
+        $specific_products = [
+            ['name' => 'Geto Suguru Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/getov1.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Geto Suguru Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/getov2.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Gojo Satoru 6 Eyes Charm', 'file' => 'catalog-assets/JJK_Bagcharms/gojo6eyes.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Gojo Satoru Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/gojov2.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Gojo Satoru Charm V3', 'file' => 'catalog-assets/JJK_Bagcharms/gojov3.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Gojo Satoru Charm V4', 'file' => 'catalog-assets/JJK_Bagcharms/gojov4.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Itadori Yuji Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/itadori.jpg', 'price' => 160.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Itadori Yuji Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/itadoriv2.jpg', 'price' => 160.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Megumi Fushiguro Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/megumi.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Nanami Kento Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/nanamiv1.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Nanami Kento Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/nanamiv2.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Nobara Kugisaki Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/nobarav2.jpg', 'price' => 150.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Panda Charm', 'file' => 'catalog-assets/JJK_Bagcharms/panda.jpg', 'price' => 140.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Panda Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/pandav2.jpg', 'price' => 140.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Sukuna Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/sukunav1.jpg', 'price' => 200.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Toji Fushiguro Charm', 'file' => 'catalog-assets/JJK_Bagcharms/toji.jpg', 'price' => 220.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Yuta Okkotsu Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/yutav1.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+            ['name' => 'Yuta Okkotsu Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/yutav2.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+        ];
+        
+        $total_products_to_generate = 50;
+
+        // --- Product Generation Logic ---
+        for ($i = 1; $i <= $total_products_to_generate; $i++) {
+            if ($i <= count($specific_products)) {
+                // Use specific JJK product data
+                $data = $specific_products[$i - 1];
+        
+                $productTag = $data['tag'] === 'Luggage & Bags' ? 'luggage-bags' : $data['tag']; 
+
+                $products[] = [
+                    'imagePath' => $data['file'], 
+                    'name' => $data['name'], 
+                    'category' => $data['category'], 
+                    'price' => $data['price'], 
+                    'productCategoryTag' => $productTag
+                ];
             } else {
-                $imagePath = "https://placehold.co/400x400/96b8d4/FFFFFF?text=Product+{$i}";
-                $name = ($i % 5 === 0) ? "Deluxe Charm Item {$i}" : "Bead Style {$i}";
-                $category = $category_data['name'];
-                $productCategoryTag = $category_data['tag'];
+                $category_data = $categories[array_rand($categories)];
+                $price = round(rand($base_price_min, $base_price_max) / 10) * 10;
+                
+                $products[] = [
+                    'imagePath' => "https://placehold.co/400x400/96b8d4/FFFFFF?text=Item+{$i}",
+                    'name' => ($i % 5 === 0) ? "Deluxe Charm Item {$i}" : "Item name {$i}",
+                    'category' => $category_data['name'],
+                    'price' => $price,
+                    'productCategoryTag' => $category_data['tag']
+                ];
             }
-
-            $products[] = [
-                'imagePath' => $imagePath, 
-                'name' => $name, 
-                'category' => $category, 
-                'price' => $price, 
-                'productCategoryTag' => $productCategoryTag
-            ];
         }
     @endphp
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16">
         {{-- Search Bar --}}
         <div id="shop-search-bar" class="py-6">
-             <input type="text" placeholder="Search product name, category, or trend..." class="w-full p-2 card-radius border border-gray-300 shadow-soft" oninput="console.log('Searching...')">
+             <input type="text" placeholder="Search product name, category, or trend..." class="w-full p-2 card-radius border border-gray-300 shadow-soft" oninput="filterProducts(selectedCategory)">
         </div>
 
         <section id="shop-view" class="py-4 md:py-8">
@@ -49,7 +76,6 @@
 
             <div class="flex flex-col md:flex-row gap-8 main-content-wrapper">
 
-                {{-- ==== SIDEBAR FILTER ==== --}}
                 <aside class="md:w-1/4 hidden md:block sticky-filter">
                     <div class="bg-white p-6 card-radius shadow-soft sticky top-0">
                         <h3 class="text-xl font-fredoka font-bold mb-4 border-b pb-2 border-neutral">Product Filters</h3>
@@ -57,11 +83,11 @@
                         <div class="space-y-3 mb-6">
                             <h4 class="font-poppins font-semibold text-dark">Filter By Category:</h4>
                             <div class="flex flex-col gap-2">
-                                <button onclick="selectCategory('all'); filterProducts('all');" data-category="all" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins hover:bg-gray-100 transition-default selected">All Products</button>
-                                <button onclick="selectCategory('home-supplies'); filterProducts('home-supplies');" data-category="home-supplies" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins hover:bg-gray-100 transition-default">Home Supplies</button>
-                                <button onclick="selectCategory('fashion-accessories'); filterProducts('fashion-accessories');" data-category="fashion-accessories" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins hover:bg-gray-100 transition-default">Fashion Accessories</button>
-                                <button onclick="selectCategory('luggage-bags'); filterProducts('luggage-bags');" data-category="luggage-bags" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins hover:bg-gray-100 transition-default">Luggage & Bags</button>
-                                <button onclick="selectCategory('collectibles'); filterProducts('collectibles');" data-category="collectibles" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins hover:bg-gray-100 transition-default">Collectibles</button>
+                                <button onclick="filterProducts('all');" data-category="all" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins transition-default selected">All Products</button>
+                                <button onclick="filterProducts('home-supplies');" data-category="home-supplies" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins transition-default">Home Supplies</button>
+                                <button onclick="filterProducts('fashion-accessories');" data-category="fashion-accessories" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins transition-default">Fashion Accessories</button>
+                                <button onclick="filterProducts('luggage-bags');" data-category="luggage-bags" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins transition-default">Luggage & Bags</button>
+                                <button onclick="filterProducts('collectibles');" data-category="collectibles" class="desktop-filter-btn filter-btn w-full text-left px-3 py-2 text-base card-radius font-poppins transition-default">Collectibles</button>
                             </div>
                         </div>
 
@@ -78,24 +104,23 @@
                                 <div id="desktop-range-progress" class="range-progress"></div>
                                 
                                 <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
-                                    oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
-                                    
+                                         oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
+                                        
                                 <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
-                                    oninput="updatePriceRange('desktop-')" class="range-input">
+                                         oninput="updatePriceRange('desktop-')" class="range-input">
                             </div>
                         </div>
 
                         <button onclick="filterProducts(selectedCategory)" class="mt-6 w-full py-2 font-fredoka font-bold card-radius text-white bg-sky hover:bg-opacity-80 transition-default shadow-soft transform hover:scale-[1.02]">
-                            VIEW FILTERED
+                            APPLY PRICE FILTER
                         </button>
                     </div>
                 </aside>
 
-                {{-- ==== PRODUCT GRID ==== --}}
                 <div class="w-full md:w-3/4 scrollable-grid">
                     <button onclick="toggleFilterModal()" class="md:hidden mb-4 w-full py-3 font-fredoka font-bold card-radius text-white bg-sky hover:bg-opacity-80 transition-default shadow-soft">
                         <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v7l-4 4v-7a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
-                        Filter By Category (Mobile)
+                        Filter & Price Range (Mobile)
                     </button>
 
                     <div id="product-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
@@ -118,11 +143,11 @@
                     <div>
                         <h4 class="font-poppins font-semibold text-dark mb-2">Categories</h4>
                         <div class="flex flex-wrap gap-2">
-                            <span onclick="selectCategory('all'); filterProducts('all');" data-category="all" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">All Products</span>
-                            <span onclick="selectCategory('home-supplies'); filterProducts('home-supplies');" data-category="home-supplies" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Home Supplies</span>
-                            <span onclick="selectCategory('fashion-accessories'); filterProducts('fashion-accessories');" data-category="fashion-accessories" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Fashion Accessories</span>
-                            <span onclick="selectCategory('luggage-bags'); filterProducts('luggage-bags');" data-category="luggage-bags" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Luggage & Bags</span>
-                            <span onclick="selectCategory('collectibles'); filterProducts('collectibles');" data-category="collectibles" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Collectibles</span>
+                            <span onclick="selectCategory('all');" data-category="all" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default selected">All Products</span>
+                            <span onclick="selectCategory('home-supplies');" data-category="home-supplies" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Home Supplies</span>
+                            <span onclick="selectCategory('fashion-accessories');" data-category="fashion-accessories" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Fashion Accessories</span>
+                            <span onclick="selectCategory('luggage-bags');" data-category="luggage-bags" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Luggage & Bags</span>
+                            <span onclick="selectCategory('collectibles');" data-category="collectibles" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Collectibles</span>
                         </div>
                     </div>
 
@@ -154,7 +179,7 @@
         </div>
 
         {{-- ==== CART SUCCESS POPUP ==== --}}
-        <div id="cart-success-modal" class="fixed bottom-4 left-0 right-0 z-50 transform translate-y-full transition-transform duration-500 max-w-sm mx-auto opacity-0">
+        <div id="cart-success-modal" class="fixed bottom-4 left-0 right-0 z-50 transform translate-y-full transition-all duration-500 max-w-sm mx-auto opacity-0">
             <div class="bg-white p-4 card-radius shadow-sakura-outline flex items-center justify-between space-x-3">
                 <div class="flex items-center space-x-3">
                     <svg class="w-6 h-6 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
@@ -169,12 +194,15 @@
             </div>
         </div>
 
-        {{-- ==== Scripts ==== --}}
         <script src="{{ asset('catalog.js') }}"></script>
         <script>
             const PHP_PRODUCTS_DATA = @json($products);
+            
             window.addEventListener('load', () => {
-                lucide.createIcons();
+                if (typeof lucide !== 'undefined' && lucide.createIcons) {
+                    lucide.createIcons();
+                }
+                
                 if (typeof initCatalog === 'function') {
                     initCatalog(PHP_PRODUCTS_DATA);
                 }

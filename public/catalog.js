@@ -11,6 +11,9 @@ function updatePriceRange(idPrefix) {
     const maxInput = document.getElementById(idPrefix + 'max-price-range');
     const progress = document.getElementById(idPrefix + 'range-progress');
     
+    // Ensure elements exist before proceeding
+    if (!minInput || !maxInput || !progress) return;
+
     let minVal = parseInt(minInput.value);
     let maxVal = parseInt(maxInput.value);
     
@@ -22,6 +25,19 @@ function updatePriceRange(idPrefix) {
         maxInput.value = minVal;
         maxVal = minVal;
     }
+
+    // Synchronize the other slider's value display
+    const otherPrefix = idPrefix === 'desktop-' ? 'mobile-' : 'desktop-';
+    const otherMinInput = document.getElementById(otherPrefix + 'min-price-range');
+    const otherMaxInput = document.getElementById(otherPrefix + 'max-price-range');
+    const otherMinDisplay = document.getElementById(otherPrefix + 'min-price-display');
+    const otherMaxDisplay = document.getElementById(otherPrefix + 'max-price-display');
+
+    if (otherMinInput) otherMinInput.value = minVal;
+    if (otherMaxInput) otherMaxInput.value = maxVal;
+    if (otherMinDisplay) otherMinDisplay.textContent = '₱' + minVal;
+    if (otherMaxDisplay) otherMaxDisplay.textContent = '₱' + maxVal;
+
 
     globalMinPrice = minVal;
     globalMaxPrice = maxVal;
@@ -41,18 +57,29 @@ function updatePriceRange(idPrefix) {
 }
 
 function filterProducts(category) {
-    selectedCategory = category;
+    // If coming from a category button click, update the global category
+    if (category) selectedCategory = category;
+
+    // Reset to page 1 for a new filter query
+    currentPage = 1;
+
+    const searchInput = document.getElementById('shop-search-bar').querySelector('input');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
     
     const filteredProducts = ALL_PRODUCTS.filter(product => {
-        const categoryMatch = (category === 'all' || product.productCategoryTag === category);
+        const categoryMatch = (selectedCategory === 'all' || product.productCategoryTag === selectedCategory);
         const priceMatch = (product.price >= globalMinPrice && product.price <= globalMaxPrice);
-        return categoryMatch && priceMatch;
+        const searchMatch = product.name.toLowerCase().includes(searchTerm) || 
+                            product.category.toLowerCase().includes(searchTerm);
+        
+        return categoryMatch && priceMatch && searchMatch;
     });
 
     updateFilterButtons(selectedCategory);
     paginateProducts(filteredProducts);
     
     const modal = document.getElementById('filter-modal');
+    // If the filter button was pressed inside the mobile modal, close it
     if (modal && !modal.classList.contains('hidden')) {
         toggleFilterModal();
     }
@@ -72,6 +99,8 @@ function renderProductGrid(products) {
     const grid = document.getElementById('product-grid');
     let html = '';
     
+    if (!grid) return;
+
     if (products.length === 0) {
         grid.innerHTML = '<div class="col-span-full text-center py-12 text-xl font-poppins text-dark/70">😔 No products found matching your filter criteria.</div>';
         return;
@@ -126,7 +155,20 @@ function changePage(pageNumber) {
     
     currentPage = pageNumber;
     
-    filterProducts(selectedCategory); 
+    // Re-run filterProducts without changing the current filters
+    const searchInput = document.getElementById('shop-search-bar').querySelector('input');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    const filteredProducts = ALL_PRODUCTS.filter(product => {
+        const categoryMatch = (selectedCategory === 'all' || product.productCategoryTag === selectedCategory);
+        const priceMatch = (product.price >= globalMinPrice && product.price <= globalMaxPrice);
+        const searchMatch = product.name.toLowerCase().includes(searchTerm) || 
+                            product.category.toLowerCase().includes(searchTerm);
+        
+        return categoryMatch && priceMatch && searchMatch;
+    });
+
+    paginateProducts(filteredProducts); 
     
     const scrollableGrid = document.querySelector('.scrollable-grid');
     if(scrollableGrid) scrollableGrid.scrollTop = 0;
@@ -154,6 +196,7 @@ function toggleFilterModal() {
     modal.classList.toggle('hidden');
     document.body.classList.toggle('overflow-hidden');
     if (!modal.classList.contains('hidden')) { 
+        updatePriceRange('mobile-');
         updateFilterButtons(selectedCategory); 
     }
 }
@@ -179,13 +222,14 @@ function initCatalog(products) {
     
     globalMinPrice = 20;
     globalMaxPrice = 1000;
-    selectCategory('all'); 
+    currentPage = 1;
+    selectedCategory = 'all'; 
     
     updatePriceRange('desktop-');
     updatePriceRange('mobile-');
 
     const modal = document.getElementById('cart-success-modal');
-    modal.classList.add('translate-y-full', 'opacity-0'); 
+    if(modal) modal.classList.add('translate-y-full', 'opacity-0'); 
 
     filterProducts('all'); 
 }

@@ -51,5 +51,13 @@ Route::get('/dashboard', function () {
     return redirect()->route('auth.page');
 })->name('dashboard');
 
+// Logout
+Route::post('/logout', function () {
+    session()->forget('user');
+    session()->flush();
+    return redirect()->route('auth.page');
+})->name('logout');
+
+
 
 

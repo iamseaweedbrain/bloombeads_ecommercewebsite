@@ -19,16 +19,15 @@
                 <a href="{{ route('cart') }}" title="View Cart">
                     <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
                 </a>
-                @if (Session::has('user'))
-                    <a href="{{ route('dashboard') }}" title="Dashboard">
-                        <i data-lucide="log-in" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                    </a>
-                @else
-                    <a href="{{ route('dashboard') }}" title="Sign In">
-                        <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                    </a>
-                @endif
-
+                    @if (Session::has('user'))
+                        <a href="{{ route('dashboard') }}" title="Dashboard">
+                            <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                        </a>
+                    @else
+                        <a href="{{ route('dashboard') }}" title="Sign In">
+                            <i data-lucide="log-in" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                        </a>
+                    @endif
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden');" class="md:hidden text-dark hover:text-sakura">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>

@@ -13,11 +13,9 @@ class UserAccountSeeder extends Seeder
     {
         DB::table('useraccount')->insert([
             'fullName' => 'Test User',
-            'username' => 'testuser',
             'email' => 'test@example.com',
             'password' => Hash::make('password123'),
             'status' => 'active',
-            'date_joined' => Carbon::now(),
             'user_id' => uniqid('user_'),
             'created_at' => now(),
             'updated_at' => now(),

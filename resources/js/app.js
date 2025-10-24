@@ -1,3 +1,4 @@
 import './bootstrap';
-import '../../public/catalog.js';
+import '../../public/js/catalog.js';
+import './authentication.js';
 

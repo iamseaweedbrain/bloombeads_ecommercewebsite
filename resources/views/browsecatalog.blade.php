@@ -194,7 +194,12 @@
             </div>
         </div>
 
+<<<<<<< HEAD
         <script src="{{ asset('catalog.js') }}"></script>
+=======
+        {{-- ==== Scripts ==== --}}
+        <script src="{{ asset('js/catalog.js') }}"></script>
+>>>>>>> d45c54c (login, signup, homepage created)
         <script>
             const PHP_PRODUCTS_DATA = @json($products);
             

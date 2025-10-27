@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Session;
 
 
@@ -39,9 +40,7 @@ Route::get('/settings', function () {
 })->name('settings');
 
 // Cart Page
-Route::get('/cart', function () {
-    return view('cart');
-})->name('cart');
+Route::get('/cart', [CartController::class, 'index'])->name('cart');
 
 // User Dashboard
 Route::get('/dashboard', function () {
@@ -57,6 +56,12 @@ Route::post('/logout', function () {
     session()->flush();
     return redirect()->route('auth.page');
 })->name('logout');
+
+// Payment
+Route::get('/payment', function () {
+    return view('payment');
+})->name('payment');
+
 
 
 

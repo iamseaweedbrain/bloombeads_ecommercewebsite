@@ -1,66 +1,24 @@
 <x-layout>
     @php
-        $categories = [
-            ['name' => 'Fashion Accessories', 'tag' => 'fashion-accessories'],
-            ['name' => 'Collectibles', 'tag' => 'collectibles'],
-            ['name' => 'Home Supplies', 'tag' => 'home-supplies'],
-            ['name' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
+
+        $categories_map = [
+            'Fashion Accessories' => 'fashion-accessories',
+            'Collectibles' => 'collectibles',
+            'Home Supplies' => 'home-supplies',
+            'Luggage & Bags' => 'luggage-bags',
         ];
-        $base_price_min = 22;
-        $base_price_max = 999;
-        $products = [];
 
-        // Specific JJK Products
-        $specific_products = [
-            ['name' => 'Geto Suguru Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/getov1.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Geto Suguru Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/getov2.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Gojo Satoru 6 Eyes Charm', 'file' => 'catalog-assets/JJK_Bagcharms/gojo6eyes.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Gojo Satoru Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/gojov2.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Gojo Satoru Charm V3', 'file' => 'catalog-assets/JJK_Bagcharms/gojov3.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Gojo Satoru Charm V4', 'file' => 'catalog-assets/JJK_Bagcharms/gojov4.jpg', 'price' => 190.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Itadori Yuji Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/itadori.jpg', 'price' => 160.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Itadori Yuji Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/itadoriv2.jpg', 'price' => 160.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Megumi Fushiguro Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/megumi.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Nanami Kento Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/nanamiv1.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Nanami Kento Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/nanamiv2.jpg', 'price' => 170.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Nobara Kugisaki Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/nobarav2.jpg', 'price' => 150.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Panda Charm', 'file' => 'catalog-assets/JJK_Bagcharms/panda.jpg', 'price' => 140.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Panda Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/pandav2.jpg', 'price' => 140.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Sukuna Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/sukunav1.jpg', 'price' => 200.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Toji Fushiguro Charm', 'file' => 'catalog-assets/JJK_Bagcharms/toji.jpg', 'price' => 220.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Yuta Okkotsu Charm V1', 'file' => 'catalog-assets/JJK_Bagcharms/yutav1.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-            ['name' => 'Yuta Okkotsu Charm V2', 'file' => 'catalog-assets/JJK_Bagcharms/yutav2.jpg', 'price' => 180.00, 'category' => 'Luggage & Bags', 'tag' => 'luggage-bags'],
-        ];
-        
-        $total_products_to_generate = 50;
+        $js_products = [];
 
-        // --- Product Generation Logic ---
-        for ($i = 1; $i <= $total_products_to_generate; $i++) {
-            if ($i <= count($specific_products)) {
-                // Use specific JJK product data
-                $data = $specific_products[$i - 1];
-        
-                $productTag = $data['tag'] === 'Luggage & Bags' ? 'luggage-bags' : $data['tag']; 
-
-                $products[] = [
-                    'imagePath' => $data['file'], 
-                    'name' => $data['name'], 
-                    'category' => $data['category'], 
-                    'price' => $data['price'], 
-                    'productCategoryTag' => $productTag
-                ];
-            } else {
-                $category_data = $categories[array_rand($categories)];
-                $price = round(rand($base_price_min, $base_price_max) / 10) * 10;
+        foreach ($products as $product) {
+            $js_products[] = [
+                'imagePath' => 'storage/' . $product->image_path,
+                'name' => $product->name,
+                'category' => $product->category,
+                'price' => (float) $product->price,
                 
-                $products[] = [
-                    'imagePath' => "https://placehold.co/400x400/96b8d4/FFFFFF?text=Item+{$i}",
-                    'name' => ($i % 5 === 0) ? "Deluxe Charm Item {$i}" : "Item name {$i}",
-                    'category' => $category_data['name'],
-                    'price' => $price,
-                    'productCategoryTag' => $category_data['tag']
-                ];
-            }
+                'productCategoryTag' => $categories_map[$product->category] ?? 'all'
+            ];
         }
     @endphp
 
@@ -104,10 +62,10 @@
                                 <div id="desktop-range-progress" class="range-progress"></div>
                                 
                                 <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
-                                         oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
-                                        
+                                       oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
+                                    
                                 <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
-                                         oninput="updatePriceRange('desktop-')" class="range-input">
+                                       oninput="updatePriceRange('desktop-')" class="range-input">
                             </div>
                         </div>
 
@@ -194,10 +152,9 @@
             </div>
         </div>
 
-        {{-- ==== Scripts ==== --}}
         <script src="{{ asset('js/catalog.js') }}"></script>
         <script>
-            const PHP_PRODUCTS_DATA = @json($products);
+            const PHP_PRODUCTS_DATA = @json($js_products);
             
             window.addEventListener('load', () => {
                 if (typeof lucide !== 'undefined' && lucide.createIcons) {

@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.getElementById('checkoutBtn').addEventListener('click', () => {
-        window.location.href = "{{ route('payment') }}";
+        window.location.href = "{{ route('payment.index') }}";
     });
 });
 </script>

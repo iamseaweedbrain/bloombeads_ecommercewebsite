@@ -16,7 +16,7 @@
                 <a href="{{ route('settings') }}" title="Settings">
                     <i data-lucide="settings" class="w-6 h-6 text-dark hover:text-sakura"></i>
                 </a>
-                <a href="{{ route('cart') }}" title="View Cart">
+                <a href="{{ route('cart.index') }}" title="View Cart">
                     <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
                 </a>
                     @if (Session::has('user'))
@@ -42,7 +42,7 @@
             <a href="{{ route('customize') }}" class="block px-3 py-2 hover:text-sakura">Design Yours</a>
             <a href="{{ route('support') }}" class="block px-3 py-2 hover:text-sakura">Help & FAQs</a>
             <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
-            <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
+            <a href="{{ route('cart.index') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
             @if (Session::has('user'))
                 <a href="{{ route('dashboard') }}" title="Dashboard"class="block px-3 py-2 hover:text-sakura">Account</a>
             @else

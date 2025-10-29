@@ -8,7 +8,6 @@ class CartController extends Controller
 {
     public function index()
     {
-        // Example cart items
         $cartItems = [
             [
                 'name' => 'Beautiful Bead 1',
@@ -25,4 +24,14 @@ class CartController extends Controller
         ];        
         return view('cart', compact('cartItems'));
     }
+
+    public function processCheckout(Request $request)
+    {
+        $total = $request->input('total');
+
+        session(['checkout_total' => $total]);
+
+        return redirect()->route('payment');
+    }
+
 }

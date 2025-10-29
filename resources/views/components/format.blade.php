@@ -11,8 +11,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 
-    {{-- Lucide Icons --}}
+    {{-- Icons --}}
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" crossorigin="anonymous"></script>
+
 
     {{-- Vite / asset files --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -41,7 +43,6 @@
 <body class="bg-neutral min-h-screen">
     {{ $slot }}
 
-    {{-- Fix for Lucide icons not loading --}}
     <script>
         window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
     </script>

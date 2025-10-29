@@ -1,32 +1,27 @@
 <x-layout>
     <section id="home-view" class="py-12 md:py-16">
 
-        <!-- Hero Section -->
         <div id="home-hero" class="pb-16 pt-0 md:py-24 text-center">
             <div class="bg-white card-radius shadow-soft p-8 md:p-16 relative overflow-hidden">
-                <!-- Subtle background element -->
+                
                 <div class="absolute inset-0 bg-sakura opacity-10"></div>
 
-                <!-- Main Heading -->
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-fredoka font-bold mb-4 relative z-[1]">
                     Your Vibe, Your Beads: Custom Beaded Jewelry & Anime Keychains.
                 </h1>
 
-                <!-- Subheading -->
                 <p class="text-lg md:text-xl font-poppins text-dark mb-10 relative z-[1] max-w-3xl mx-auto">
                     Craft your own custom beaded style. Handmade quality, delivered with care.
                     Find the perfect accessory to express yourself.
                 </p>
 
-                <!-- Action Buttons -->
                 <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6 relative z-[1]">
-                    <!-- CTA Button -->
+                    
                     <a href="{{ route('customize') }}"
                     class="py-3 px-8 text-lg font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft transform hover:scale-[1.02]">
                         DESIGN YOURS
                     </a>
 
-                    <!-- Secondary Button -->
                     <a href="{{ route('browsecatalog') }}"
                     class="py-3 px-8 text-lg font-fredoka font-bold card-radius text-sakura border-2 border-sakura bg-white hover:bg-sakura hover:text-white transition-default shadow-soft">
                         BROWSE CATALOGUE
@@ -35,7 +30,6 @@
             </div>
         </div>
 
-        <!-- Customization Promise Section -->
         <section id="custom-promise" class="py-12 md:py-16 bg-white card-radius shadow-soft my-16 p-8">
             <h2 class="text-3xl font-fredoka font-bold mb-8 text-center text-sakura">
                 Your Custom Beaded Bracelet Promise
@@ -55,14 +49,12 @@
                     </ul>
                 </div>
 
-                <!-- Mock Image -->
                 <div class="order-1 md:order-2 mb-6 md:mb-0 aspect-video bg-sky/20 card-radius flex items-center justify-center shadow-soft">
                     <span id="home-preview-text" class="text-xl font-poppins text-dark/70">Custom Bracelet Tool Mockup</span>
                 </div>
             </div>
         </section>
 
-        <!-- What Bloombeads Offers Section -->
         <section id="products-offer" class="py-12 md:py-16 bg-neutral card-radius shadow-soft p-8 border border-gray-200">
             <h2 class="text-3xl font-fredoka font-bold mb-8 text-center">
                 What Bloombeads Offers
@@ -88,43 +80,5 @@
 
     </section>
 
-    <!-- Footer Section -->
-    <footer class="bg-[#CFE7FF] mt-20">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start px-10 py-10">
-
-            <!-- Left Side -->
-            <div class="text-center md:text-left mb-6 md:mb-0">
-                <h1 class="text-4xl font-fredoka font-bold text-[#F77AA6]">Bloombeads</h1>
-            </div>
-
-            <!-- Right Side -->
-            <div class="text-center md:text-right">
-                <h2 class="text-lg font-semibold text-gray-800 mb-2">Visit us on</h2>
-                <ul class="space-y-2 text-gray-700">
-                    <li class="flex items-center justify-center md:justify-end space-x-2">
-                        <a href="https://facebooklink.com" class="text-gray-800 hover:underline">https://facebooklink.com//</a>
-                        <span class="bg-[#F77AA6] text-white rounded-full p-1">
-                            <i class="fab fa-facebook-f"></i>
-                        </span>
-                    </li>
-                    <li class="flex items-center justify-center md:justify-end space-x-2">
-                        <a href="https://instagramlink.com" class="text-gray-800 hover:underline">https://instagramlink.com//</a>
-                        <span class="bg-[#F77AA6] text-white rounded-full p-1">
-                            <i class="fab fa-instagram"></i>
-                        </span>
-                    </li>
-                    <li class="flex items-center justify-center md:justify-end space-x-2">
-                        <a href="https://tiktoklink.com" class="text-gray-800 hover:underline">https://tiktoklink.com//</a>
-                        <span class="bg-[#F77AA6] text-white rounded-full p-1">
-                            <i class="fab fa-tiktok"></i>
-                        </span>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </footer>
-        <!-- Copyright -->
-        <div class="text-center py-3 border-t border-gray-200 text-sm text-gray-600">
-            ©2025 Bloombeads. All Rights Reserved.
-        </div>
+    
 </x-layout>

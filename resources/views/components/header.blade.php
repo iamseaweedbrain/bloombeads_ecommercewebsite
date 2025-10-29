@@ -44,7 +44,6 @@
             <a href="{{ route('browsecatalog') }}" class="block px-3 py-2 hover:text-sakura">Browse Catalogue</a>
             <a href="{{ route('customize') }}" class="block px-3 py-2 hover:text-sakura">Design Yours</a>
             <a href="{{ route('support') }}" class="block px-3 py-2 hover:text-sakura">Help & FAQs</a>
-
             @if (Session::has('user'))
                 <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
                 <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>

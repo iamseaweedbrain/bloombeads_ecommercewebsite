@@ -7,16 +7,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\SettingsController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application.
-| These routes are loaded by the RouteServiceProvider within a group
-| which contains the "web" middleware group.
-|
 */
 
 /* ===============================
@@ -33,7 +29,6 @@ Route::post('/logout', function () {
     return redirect()->route('auth.page');
 })->name('logout');
 
-
 /* ===============================
    ADMIN AUTH ROUTES
    =============================== */
@@ -41,7 +36,6 @@ Route::post('/logout', function () {
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
-
 
 /* ===============================
    USER ROUTES
@@ -59,9 +53,6 @@ Route::view('/customize', 'customize')->name('customize');
 // Support / Help Page
 Route::view('/support', 'support')->name('support');
 
-// Settings Page
-Route::view('/settings', 'settings')->name('settings');
-
 // Cart Page
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 
@@ -76,13 +67,22 @@ Route::get('/dashboard', function () {
     return redirect()->route('auth.page');
 })->name('dashboard');
 
+/* ===============================
+   SETTINGS ROUTES
+   =============================== */
+   
+Route::middleware(['web'])->group(function () {
+    Route::view('/settings', 'account_settings.settings')->name('settings.page');
+    Route::post('/settings/profile/update', [AuthController::class, 'updateProfile'])->name('settings.profile.update');
+    Route::post('/settings/password/update', [AuthController::class, 'updatePassword'])->name('settings.password.update');
+});
+
 
 /* ===============================
-   ADMIN ROUTES (Protected by Middleware)
+   ADMIN ROUTES (Protected)
    =============================== */
-
 Route::middleware('auth.admin')->prefix('admin')->name('admin.')->group(function () {
-    
+
     // Dashboard
     Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
 

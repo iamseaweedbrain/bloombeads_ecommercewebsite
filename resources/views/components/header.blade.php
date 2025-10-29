@@ -13,21 +13,28 @@
             </nav>
 
             <div class="flex items-center space-x-4">
-                <a href="{{ route('settings') }}" title="Settings">
-                    <i data-lucide="settings" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                </a>
-                <a href="{{ route('cart') }}" title="View Cart">
-                    <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                </a>
-                    @if (Session::has('user'))
-                        <a href="{{ route('dashboard') }}" title="Dashboard">
-                            <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                        </a>
-                    @else
-                        <a href="{{ route('dashboard') }}" title="Sign In">
-                            <i data-lucide="log-in" class="w-6 h-6 text-dark hover:text-sakura"></i>
-                        </a>
-                    @endif
+                @if (Session::has('user'))
+                    {{-- Settings icon --}}
+                    <a href="{{ route('settings.page') }}" title="Settings">
+                        <i data-lucide="settings" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                    </a>
+
+                    {{-- Cart icon --}}
+                    <a href="{{ route('cart.index') }}" title="View Cart">
+                        <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                    </a>
+
+                    {{-- Dashboard icon --}}
+                    <a href="{{ route('dashboard') }}" title="Dashboard">
+                        <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                    </a>
+                @else
+                    {{-- Sign-in icon for guests --}}
+                    <a href="{{ route('auth.page') }}" title="Sign In">
+                        <i data-lucide="log-in" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                    </a>
+                @endif
+
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden');" class="md:hidden text-dark hover:text-sakura">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
@@ -41,12 +48,13 @@
             <a href="{{ route('browsecatalog') }}" class="block px-3 py-2 hover:text-sakura">Browse Catalogue</a>
             <a href="{{ route('customize') }}" class="block px-3 py-2 hover:text-sakura">Design Yours</a>
             <a href="{{ route('support') }}" class="block px-3 py-2 hover:text-sakura">Help & FAQs</a>
-            <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
-            <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
+
             @if (Session::has('user'))
-                <a href="{{ route('dashboard') }}" title="Dashboard"class="block px-3 py-2 hover:text-sakura">Account</a>
+                <a href="{{ route('settings.page') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
+                <a href="{{ route('cart.index') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
+                <a href="{{ route('dashboard') }}" class="block px-3 py-2 hover:text-sakura">Account</a>
             @else
-                <a href="{{ route('dashboard') }}" title="Sign In"class="block px-3 py-2 hover:text-sakura">Sign In</a>
+                <a href="{{ route('auth.page') }}" class="block px-3 py-2 hover:text-sakura">Sign In</a>
             @endif
         </div>
     </div>

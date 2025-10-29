@@ -53,8 +53,6 @@ class AuthController extends Controller
             : redirect()->route('auth.page')->with('success', $message);
     }
 
-
-
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -74,5 +72,76 @@ class AuthController extends Controller
 
         session(['user' => $user]);
         return redirect()->route('dashboard');
+    }
+
+    /* ===============================
+       SETTINGS: UPDATE PROFILE
+       =============================== */
+    public function updateProfile(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('auth.page')->with('login_error', 'Please log in first.');
+        }
+
+        $validated = $request->validate([
+            'fullName' => 'required|string|max:255',
+            'email'    => 'required|email|max:255',
+            'phone'    => 'nullable|string|max:20',
+            'birthday' => 'nullable|date',
+        ]);
+
+        try {
+            DB::table('useraccount')
+                ->where('user_id', $user->user_id)
+                ->update([
+                    'fullName' => $validated['fullName'],
+                    'email'    => $validated['email'],
+                    'phone'    => $validated['phone'] ?? null,
+                    'birthday' => $validated['birthday'] ?? null,
+                    'updated_at' => now(),
+                ]);
+
+            // Refresh session
+            $updatedUser = DB::table('useraccount')->where('user_id', $user->user_id)->first();
+            session(['user' => $updatedUser]);
+
+            return back()->with('success', 'Profile updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Database error: ' . $e->getMessage());
+        }
+    }
+
+    /* ===============================
+       SETTINGS: UPDATE PASSWORD
+       =============================== */
+    public function updatePassword(Request $request)
+    {
+        $user = session('user');
+        if (!$user) {
+            return redirect()->route('auth.page')->with('login_error', 'Please log in first.');
+        }
+
+        $validated = $request->validate([
+            'current_password' => 'required',
+            'new_password'     => 'required|min:6|confirmed',
+        ]);
+
+        if (!Hash::check($validated['current_password'], $user->password)) {
+            return back()->with('error', 'Current password is incorrect.');
+        }
+
+        try {
+            DB::table('useraccount')
+                ->where('user_id', $user->user_id)
+                ->update([
+                    'password' => Hash::make($validated['new_password']),
+                    'updated_at' => now(),
+                ]);
+
+            return back()->with('success', 'Password updated successfully.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error updating password: ' . $e->getMessage());
+        }
     }
 }

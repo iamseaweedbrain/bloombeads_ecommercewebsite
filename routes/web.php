@@ -1,55 +1,47 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CartController;
 use Illuminate\Support\Facades\Session;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\ProductController as AdminProductController;
-use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\CartController;
+
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\ProductController as AdminProductController;
 
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
 Route::post('/auth/signup', [AuthController::class, 'signUp'])->name('auth.signup');
 Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('/checkout-process', [CartController::class, 'processCheckout'])->name('checkout.process');
+
+Route::post('/logout', function () {
+    Session::flush();
+    return redirect()->route('auth.page');
+})->name('logout');
+
+
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// Homepage
-Route::get('/', function () {
-    return view('homepage');
-})->name('homepage');
 
-Route::get('/homepage', function () {
-    return view('homepage');
-})->name('homepage');
+Route::view('/', 'homepage')->name('homepage');
 
-/// Browse Catalog
-    Route::get('/browsecatalog', [ProductController::class, 'index'])
-    ->name('browsecatalog');
+Route::get('/browsecatalog', [ProductController::class, 'index'])->name('browsecatalog');
 
-// Customize Page
-Route::get('/customize', function () {
-    return view('customize');
-})->name('customize');
+Route::view('/customize', 'customize')->name('customize');
 
-// Support / Help Page
-Route::get('/support', function () {
-    return view('support');
-})->name('support');
+Route::view('/support', 'support')->name('support');
 
-// Settings Page
-Route::get('/settings', function () {
-    return view('settings');
-})->name('settings');
+Route::view('/settings', 'settings')->name('settings');
 
-// Cart Page
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 
-// User Dashboard
+Route::view('/payment', 'payment')->name('payment');
+
 Route::get('/dashboard', function () {
     if (Session::has('user')) {
         return view('dashboard');
@@ -57,25 +49,10 @@ Route::get('/dashboard', function () {
     return redirect()->route('auth.page');
 })->name('dashboard');
 
-// Logout
-Route::post('/logout', function () {
-    session()->forget('user');
-    session()->flush();
-    return redirect()->route('auth.page');
-})->name('logout');
 
-<<<<<<< HEAD
-// Payment
-Route::get('/payment', function () {
-    return view('payment');
-})->name('payment');
-
-
-=======
 // --- ADMIN ROUTES ---
 Route::middleware('session.user')->prefix('admin')->name('admin.')->group(function () {
     
->>>>>>> 4034cc26ba79638cb87bd81f96bf58efa224991a
 
     // Route name: admin.dashboard
     Route::get('/dashboard', function() {

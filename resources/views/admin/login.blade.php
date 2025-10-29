@@ -6,7 +6,7 @@
     <title>Bloombeads - Admin Login</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    @vite('resources/css/admin.css')
+    @vite('resources/css/app.css')
     <script>
         tailwind.config = {
             theme: {

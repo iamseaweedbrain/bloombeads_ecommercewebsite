@@ -9,6 +9,7 @@ use App\Http\Controllers\CartController;
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
+use App\Http\Controllers\SettingsController;
 
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');

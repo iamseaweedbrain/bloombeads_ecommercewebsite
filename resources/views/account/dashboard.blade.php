@@ -7,7 +7,7 @@
 
     <div class="container mx-auto py-10 px-4">
         <h1 class="text-3xl font-bold text-center mb-10 text-gray-800">
-            🌸 Welcome Back, Jan!
+            🌸 Welcome Back, User!
         </h1>
 
         <div class="grid md:grid-cols-4 gap-8">

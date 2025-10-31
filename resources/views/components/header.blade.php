@@ -20,11 +20,11 @@
                     <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
                 </a>
                     @if (Session::has('user'))
-                        <a href="{{ route('dashboard') }}" title="Dashboard">
+                        <a href="{{ route('account.dashboard') }}" title="Dashboard">
                             <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
                         </a>
                     @else
-                        <a href="{{ route('dashboard') }}" title="Sign In">
+                        <a href="{{ route('auth.page') }}" title="Sign In">
                             <i data-lucide="log-in" class="w-6 h-6 text-dark hover:text-sakura"></i>
                         </a>
                     @endif
@@ -44,9 +44,9 @@
             <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
             <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
             @if (Session::has('user'))
-                <a href="{{ route('dashboard') }}" title="Dashboard"class="block px-3 py-2 hover:text-sakura">Account</a>
+                <a href="{{ route('account.dashboard') }}" title="Dashboard"class="block px-3 py-2 hover:text-sakura">Account</a>
             @else
-                <a href="{{ route('dashboard') }}" title="Sign In"class="block px-3 py-2 hover:text-sakura">Sign In</a>
+                <a href="{{ route('auth.page') }}" title="Sign In"class="block px-3 py-2 hover:text-sakura">Sign In</a>
             @endif
         </div>
     </div>

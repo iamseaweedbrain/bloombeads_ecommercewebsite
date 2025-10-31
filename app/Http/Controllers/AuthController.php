@@ -73,6 +73,6 @@ class AuthController extends Controller
         }
 
         session(['user' => $user]);
-        return redirect()->route('dashboard');
+        return redirect()->route('account.dashboard');
     }
 }

@@ -1,0 +1,15 @@
+:root {
+    --color-sakura: #FF9EBB;
+    --color-cta: #FFB347;
+    --color-neutral: #F5F5F5;
+    --color-dark: #333333;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+a.active {
+    background-color: var(--color-sakura);
+    color: white;
+}

@@ -96,7 +96,7 @@ input[type="text"] {
 }
 .scrollable-grid {
     overflow-y: auto; 
-    padding-right: 1.5rem;
+    padding-right: 0.75rem; 
 }
 .sticky-filter {
     height: 100%; 

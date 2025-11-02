@@ -13,24 +13,20 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 
-// --- GUEST AND AUTH ROUTES ---
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
 Route::post('/auth/signup', [AuthController::class, 'signUp'])->name('auth.signup');
 Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); // Using AuthController logout
 
-// --- ADMIN AUTH ROUTES ---
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');
 
-// --- PUBLIC PAGES ---
 Route::view('/', 'homepage')->name('homepage');
 Route::get('/browsecatalog', [ProductController::class, 'index'])->name('browsecatalog');
 Route::view('/customize', 'customize')->name('customize');
 Route::view('/support', 'support')->name('support');
 
-// --- AUTHENTICATED USER ROUTES ---
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', function () {

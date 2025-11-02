@@ -17,6 +17,10 @@
                 'category' => $product->category,
                 'price' => (float) $product->price,
                 
+                // vvv THIS IS THE NEW LINE vvv
+                'stock' => (int) $product->stock,
+                // ^^^ END OF NEW LINE ^^^
+
                 'productCategoryTag' => $categories_map[$product->category] ?? 'all'
             ];
         }
@@ -68,7 +72,7 @@
                                 
                                 <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
                                        oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
-                                    
+                                
                                 <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
                                        oninput="updatePriceRange('desktop-')" class="range-input">
                             </div>

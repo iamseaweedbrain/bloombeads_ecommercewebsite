@@ -8,8 +8,8 @@ let globalMaxPrice = 1000;
 let currentPage = 1;
 let csrfToken = ''; 
 let cartAddUrl = ''; 
-let IS_LOGGED_IN = false; // <-- ADD THIS
-let AUTH_URL = '/auth'; // <-- ADD THIS
+let IS_LOGGED_IN = false;
+let AUTH_URL = '/auth';
 
 // --- DOM Element Cache ---
 let desktopMinRange, desktopMaxRange, desktopMinDisplay, desktopMaxDisplay, desktopProgress;
@@ -145,6 +145,8 @@ function paginateProducts(products) {
     renderPagination(totalPages, totalItems);
 }
 
+
+// --- vvv THIS IS THE UPDATED FUNCTION vvv ---
 /**
  * Renders the product cards into the grid.
  * @param {Array} products - The products to display for the current page.
@@ -156,33 +158,55 @@ function renderProductGrid(products) {
         return;
     }
     
-    productGrid.innerHTML = products.map(product => `
-        <div class_name="product-card bg-white card-radius shadow-soft overflow-hidden transition-shadow duration-300 group hover:shadow-lg flex flex-col"
-             data-category="${product.productCategoryTag}" data-price="${product.price}">
-            <a href="#" class="block aspect-square bg-gray-100 items-center justify-center overflow-hidden group/image" aria-label="View details for ${product.name}">
-                <img src="${product.imagePath}" alt="" class="w-full h-full object-cover transition-transform duration-300 group-hover/image:scale-105" loading="lazy">
-            </a>
-            <div class="p-3 flex flex-col grow">
-                <h4 class="font-poppins font-semibold text-dark truncate group-hover:text-sky mb-1 text-sm sm:text-base" title="${product.name}">${product.name}</h4>
-                <p class="font-poppins text-xs text-dark/70 mb-1 capitalize">${product.productCategoryTag.replace('-', ' ')}</p>
-                <p class="font-poppins font-bold text-lg sm:text-xl text-sakura my-1">₱${product.price.toFixed(2)}</p>
-                <div class="mt-auto pt-2 flex justify-between items-center">
-                     <a href="#" class="text-xs sm:text-sm text-dark hover:text-sky transition-default font-poppins">View Details</a>
-                     <form action="${cartAddUrl}" method="POST" class="add-to-cart-form">
-                         <input type="hidden" name="_token" value="${csrfToken}">
-                         <input type="hidden" name="product_id" value="${product.id}">
-                         <input type="hidden" name="quantity" value="1">
-                         <button type="submit" class="p-2 rounded-full bg-cta text-white hover:bg-opacity-90 transition-all duration-200 transform group-hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-1" aria-label="Add ${product.name} to cart">
-                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
-                         </button>
-                     </form>
+    productGrid.innerHTML = products.map(product => {
+        // Create a variable for the button/badge HTML
+        let actionButtonHtml = '';
+
+        if (product.stock > 0) {
+            // If stock is > 0, show the "Add to Cart" button
+            actionButtonHtml = `
+                <form action="${cartAddUrl}" method="POST" class="add-to-cart-form">
+                    <input type="hidden" name="_token" value="${csrfToken}">
+                    <input type="hidden" name="product_id" value="${product.id}">
+                    <input type="hidden" name="quantity" value="1">
+                    <button type="submit" class="p-2 rounded-full bg-cta text-white hover:bg-opacity-90 transition-all duration-200 transform group-hover:scale-110 focus:outline-none focus:ring-2 focus:ring-cta focus:ring-offset-1" aria-label="Add ${product.name} to cart">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </button>
+                </form>
+            `;
+        } else {
+            // If stock is 0, show a "Sold Out" badge
+            // Wrap the badge in a div to maintain flex alignment
+            actionButtonHtml = `
+                <div>
+                    <span class="sold-out-badge">Sold Out</span>
+                </div>
+            `;
+        }
+        
+        // Return the full card HTML
+        // (I also fixed the 'class_name' typo to 'class')
+        return `
+            <div class="product-card bg-white card-radius shadow-soft overflow-hidden transition-shadow duration-300 group hover:shadow-lg flex flex-col"
+                 data-category="${product.productCategoryTag}" data-price="${product.price}">
+                <a href="#" class="block aspect-square bg-gray-100 items-center justify-center overflow-hidden group/image" aria-label="View details for ${product.name}">
+                    <img src="${product.imagePath}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover/image:scale-105" loading="lazy">
+                </a>
+                <div class="p-3 flex flex-col grow">
+                    <h4 class="font-poppins font-semibold text-dark truncate group-hover:text-sky mb-1 text-sm sm:text-base" title="${product.name}">${product.name}</h4>
+                    <p class="font-poppins text-xs text-dark/70 mb-1 capitalize">${product.category}</p>
+                    <p class="font-poppins font-bold text-lg sm:text-xl text-sakura my-1">₱${product.price.toFixed(2)}</p>
+                    <div class="mt-auto pt-2 flex justify-between items-center">
+                         <a href="#" class="text-xs sm:text-sm text-dark hover:text-sky transition-default font-poppins">View Details</a>
+                         ${actionButtonHtml}  </div>
                 </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
     
     addCartFormListeners(); 
 }
+// --- ^^^ END OF UPDATED FUNCTION ^^^ ---
 
 /**
  * Attaches submit event listeners to all add-to-cart forms using delegation.
@@ -208,18 +232,15 @@ function handleCartFormSubmitDelegation(event) {
  * @param {HTMLFormElement} form - The form that was submitted.
  */
 function handleCartFormSubmit(form) {
-    // vvv NEW CHECK vvv
     if (!IS_LOGGED_IN) {
-        // If user is not logged in, show a toast and redirect
         if (typeof showToast === 'function') {
             showToast('Please log in to add items to your cart.', 'error');
         }
         setTimeout(() => {
             window.location.href = AUTH_URL;
         }, 2000);
-        return; // Stop the function
+        return; 
     }
-    // ^^^ END OF NEW CHECK ^^^
 
     const formData = new FormData(form);
     const button = form.querySelector('button[type="submit"]');
@@ -377,7 +398,7 @@ window.toggleFilterModal = toggleFilterModal;
 /**
  * @param {Array} products -
  * @param {boolean} isLoggedIn -
- * @param {string} authUrl -
+ ** @param {string} authUrl -
  */
 function initCatalog(products, isLoggedIn, authUrl) {
     ALL_PRODUCTS = Array.isArray(products) ? products : [];
@@ -423,8 +444,8 @@ document.addEventListener('DOMContentLoaded', () => {
          desktopMaxRange.addEventListener('input', () => updatePriceRange('desktop-'));
      }
      if(mobileMinRange && mobileMaxRange) {
-          mobileMinRange.addEventListener('input', () => updatePriceRange('mobile-'));
-          mobileMaxRange.addEventListener('input', () => updatePriceRange('mobile-'));
+           mobileMinRange.addEventListener('input', () => updatePriceRange('mobile-'));
+           mobileMaxRange.addEventListener('input', () => updatePriceRange('mobile-'));
      }
      if(desktopMinRange) desktopMinRange.addEventListener('change', () => filterProducts());
      if(desktopMaxRange) desktopMaxRange.addEventListener('change', () => filterProducts());

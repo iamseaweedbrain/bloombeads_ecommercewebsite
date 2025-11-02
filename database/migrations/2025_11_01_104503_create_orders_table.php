@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id(); // Order ID
             
-            // Link to the user who placed the order
-            $table->foreignId('user_id')->constrained('useraccount')->onDelete('cascade');
+            // This is the corrected line:
+            $table->foreignId('user_id')->constrained(table: 'useraccount', column: 'user_id')->onDelete('cascade');
             
             // Your unique tracking ID (e.g., BB-1234ABCD)
             $table->string('order_tracking_id')->unique();

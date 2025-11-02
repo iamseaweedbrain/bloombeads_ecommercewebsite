@@ -107,3 +107,18 @@ input[type="text"] {
     border-bottom: 2px solid var(--color-sakura);
     font-weight: 700;
 }
+
+/* --- vvv NEW STYLE FOR SOLD OUT vvv --- */
+.sold-out-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem; /* 4px 12px */
+    font-size: 0.75rem; /* 12px */
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #b91c1c; /* A dark red */
+    background-color: #fef2f2; /* A light red */
+    border: 1px solid #fecaca; /* A border red */
+    border-radius: 9999px; /* pill-shaped */
+    text-transform: uppercase;
+}
+/* --- ^^^ END OF NEW STYLE ^^^ --- */

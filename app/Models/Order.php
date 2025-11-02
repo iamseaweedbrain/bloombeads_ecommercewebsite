@@ -4,8 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User; // <-- This import was missing
-use App\Models\OrderItem; // <-- This is also needed
+use App\Models\User;
+use App\Models\OrderItem;
 
 class Order extends Model
 {
@@ -29,7 +29,6 @@ class Order extends Model
      */
     public function user()
     {
-        // This links to your 'useraccount' table via the user_id
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
 }

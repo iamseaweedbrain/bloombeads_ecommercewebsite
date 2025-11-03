@@ -31,8 +31,9 @@
         <div class="bg-white p-6 card-radius shadow-soft top-20 h-[600px] overflow-y-auto custom-scrollbar">
             <h3 class="text-xl font-fredoka font-bold mb-4 border-b pb-2 border-neutral">Bead Selection</h3>
 
-            <!--Place More Buttons Under Here-->
+
             <div class="grid grid-cols-4 gap-4">
+                <!--Place More Buttons Under Here-->
                 <button class="bead-btn relative w-full aspect-square rounded-xl overflow-hidden bg-neutral/10 shadow-soft hover:scale-105 hover:shadow-lg transition-transform duration-300" data-bead="bead1.jpg">
                     <img src="/custom-beads/bead1.jpg" alt="Bead 1" class="w-full h-full object-cover">
                 </button>
@@ -81,6 +82,9 @@
                     <img src="/custom-beads/bead12.jpg" alt="Bead 12" class="w-full h-full object-cover">
                 </button>
 
+
+
+                <!-- Place More Buttons Above Here -->
             </div>
 
         </div>

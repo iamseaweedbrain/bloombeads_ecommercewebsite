@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -23,28 +24,23 @@ class AuthController extends Controller
      */
     public function login(Request $request)
     {
-        //Validate the form data
-        $credentials = $request->validate([
-            'username' => 'required|string',
-            'password' => 'required',
+    $credentials = $request->validate([
+        'username' => 'required|string',
+        'password' => 'required',
+    ]);
+
+    $user = DB::table('admin_users')->where('username', $credentials['username'])->first();
+
+    if (!$user || !Hash::check($credentials['password'], $user->password)) {
+        
+        throw ValidationException::withMessages([
+            'username' => 'The provided credentials do not match our records.',
         ]);
+    }
 
-        $user = DB::table('admin_users')->where('username', $credentials['username'])->first();
+    Session::put('admin_users', $user);
 
-        if (!$user) {
-            return redirect()->route('admin.login.form')
-                ->with('login_error', 'Invalid login credentials.');
-        }
-
-        if (Hash::check($credentials['password'], $user->password)) {
-            
-            Session::put('admin_user', $user);
-
-            return redirect()->route('admin.dashboard');
-        }
-
-        return redirect()->route('admin.login.form')
-            ->with('login_error', 'Invalid login credentials.');
+    return redirect()->route('admin.dashboard');
     }
 
     /*

@@ -9,14 +9,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('useraccount', function (Blueprint $table) {
-            $table->id();
+            
+            $table->id('user_id'); 
+
             $table->string('fullName', 100);
             $table->string('username', 100)->unique();
             $table->string('email', 100)->unique();
             $table->string('password', 255);
             $table->string('status', 20)->default('active');
             $table->timestamp('date_joined')->useCurrent();
-            $table->string('user_id', 50)->unique();
+            
             $table->timestamps();
         });
     }

@@ -1,6 +1,5 @@
 <x-layout>
     @php
-
         $categories_map = [
             'Fashion Accessories' => 'fashion-accessories',
             'Collectibles' => 'collectibles',
@@ -12,17 +11,27 @@
 
         foreach ($products as $product) {
             $js_products[] = [
+                'id' => $product->id, 
                 'imagePath' => 'storage/' . $product->image_path,
                 'name' => $product->name,
                 'category' => $product->category,
                 'price' => (float) $product->price,
                 
+                // vvv THIS IS THE NEW LINE vvv
+                'stock' => (int) $product->stock,
+                // ^^^ END OF NEW LINE ^^^
+
                 'productCategoryTag' => $categories_map[$product->category] ?? 'all'
             ];
         }
+
+        $isLoggedIn = Auth::check();
+        $authUrl = route('auth.page');
     @endphp
 
-    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16">
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16" 
+          data-cart-add-url="{{ $isLoggedIn ? route('cart.add') : '' }}">
+        
         {{-- Search Bar --}}
         <div id="shop-search-bar" class="py-6">
              <input type="text" placeholder="Search product name, category, or trend..." class="w-full p-2 card-radius border border-gray-300 shadow-soft" oninput="filterProducts(selectedCategory)">
@@ -63,7 +72,7 @@
                                 
                                 <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
                                        oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
-                                    
+                                
                                 <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
                                        oninput="updatePriceRange('desktop-')" class="range-input">
                             </div>
@@ -77,7 +86,7 @@
 
                 <div class="w-full md:w-3/4 scrollable-grid">
                     <button onclick="toggleFilterModal()" class="md:hidden mb-4 w-full py-3 font-fredoka font-bold card-radius text-white bg-sky hover:bg-opacity-80 transition-default shadow-soft">
-                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v7l-4 4v-7a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                        <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6-4.14 6.414a1 1 0 00-.293.707v7l-4 4v-7a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
                         Filter & Price Range (Mobile)
                     </button>
 
@@ -89,67 +98,6 @@
 
         {{-- ==== MOBILE FILTER MODAL ==== --}}
         <div id="filter-modal" class="fixed inset-0 bg-dark bg-opacity-70 z-50 hidden transition-opacity duration-300">
-            <div class="absolute bottom-0 w-full bg-neutral card-radius rounded-b-none p-6 transform translate-y-0 h-3/4 overflow-y-auto">
-                <div class="flex justify-between items-center mb-6 border-b pb-4 border-gray-200">
-                    <h2 class="text-2xl font-fredoka font-bold text-dark">Filter Products</h2>
-                    <button onclick="toggleFilterModal()" class="text-dark hover:text-sakura transition-default p-1">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-
-                <div class="space-y-6">
-                    <div>
-                        <h4 class="font-poppins font-semibold text-dark mb-2">Categories</h4>
-                        <div class="flex flex-wrap gap-2">
-                            <span onclick="selectCategory('all');" data-category="all" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default selected">All Products</span>
-                            <span onclick="selectCategory('home-supplies');" data-category="home-supplies" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Home Supplies</span>
-                            <span onclick="selectCategory('fashion-accessories');" data-category="fashion-accessories" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Fashion Accessories</span>
-                            <span onclick="selectCategory('luggage-bags');" data-category="luggage-bags" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Luggage & Bags</span>
-                            <span onclick="selectCategory('collectibles');" data-category="collectibles" class="mobile-filter-span px-4 py-2 bg-white text-dark font-fredoka font-bold text-base card-radius shadow-soft cursor-pointer transition-default">Collectibles</span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3 border-t pt-4 border-neutral">
-                        <h4 class="font-poppins font-semibold text-dark">Price Range (₱):</h4>
-
-                        <div class="flex justify-between font-poppins text-sm">
-                            <span class="text-dark/70">Min: <span id="mobile-min-price-display" class="price-range-display">₱20</span></span>
-                            <span class="text-dark/70">Max: <span id="mobile-max-price-display" class="price-range-display">₱1000</span></span>
-                        </div>
-
-                        <div class="range-container">
-                            <div class="range-slider-base"></div>
-                            <div id="mobile-range-progress" class="range-progress"></div>
-
-                            <input id="mobile-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
-                                oninput="updatePriceRange('mobile-')" class="range-input" style="z-index: 2;">
-                                
-                            <input id="mobile-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
-                                oninput="updatePriceRange('mobile-')" class="range-input">
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="filterProducts(selectedCategory)" class="mt-8 w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
-                    APPLY & VIEW RESULTS
-                </button>
-            </div>
-        </div>
-
-        {{-- ==== CART SUCCESS POPUP ==== --}}
-        <div id="cart-success-modal" class="fixed bottom-4 left-0 right-0 z-50 transform translate-y-full transition-all duration-500 max-w-sm mx-auto opacity-0">
-            <div class="bg-white p-4 card-radius shadow-sakura-outline flex items-center justify-between space-x-3">
-                <div class="flex items-center space-x-3">
-                    <svg class="w-6 h-6 text-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
-                    <span class="font-poppins font-semibold text-dark">Product Added to Cart!</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <a href="{{ url('/cart') }}" class="text-sm font-fredoka font-bold text-sakura underline hover:no-underline transition-default">View Cart</a>
-                    <button onclick="hideCartSuccess()" class="p-1 rounded-full text-dark hover:bg-neutral transition-default">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-            </div>
         </div>
 
         <script src="{{ asset('js/catalog.js') }}"></script>
@@ -162,7 +110,7 @@
                 }
                 
                 if (typeof initCatalog === 'function') {
-                    initCatalog(PHP_PRODUCTS_DATA);
+                    initCatalog(PHP_PRODUCTS_DATA, {{ $isLoggedIn ? 'true' : 'false' }}, '{{ $authUrl }}');
                 }
             });
         </script>

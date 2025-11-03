@@ -13,23 +13,29 @@
             </nav>
 
             <div class="flex items-center space-x-4">
-                @if (Session::has('user'))
-                    {{-- Show these only when logged in --}}
+                
+                @auth
                     <a href="{{ route('settings') }}" title="Settings">
                         <i data-lucide="settings" class="w-6 h-6 text-dark hover:text-sakura"></i>
                     </a>
-                    <a href="{{ route('cart') }}" title="View Cart">
+
+                    <a href="{{ route('cart') }}" title="View Cart" class="relative">
                         <i data-lucide="shopping-cart" class="w-6 h-6 text-dark hover:text-sakura"></i>
+                        <span id="cart-badge" 
+                              class="absolute -top-2 -right-3 bg-sakura text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center
+                              {{ $cartTotalQuantity > 0 ? '' : 'hidden' }}">
+                            {{ $cartTotalQuantity }}
+                        </span>
                     </a>
+
                     <a href="{{ route('dashboard') }}" title="Dashboard">
                         <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
                     </a>
                 @else
-                    {{-- Not logged in → show Sign In / Sign Up --}}
                     <a href="{{ route('auth.page') }}" class="font-poppins text-dark hover:text-sakura font-medium">
                         Login / Sign Up
                     </a>
-                @endif
+                @endguest
 
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden');" class="md:hidden text-dark hover:text-sakura">
                     <i data-lucide="menu" class="w-6 h-6"></i>
@@ -44,13 +50,14 @@
             <a href="{{ route('browsecatalog') }}" class="block px-3 py-2 hover:text-sakura">Browse Catalogue</a>
             <a href="{{ route('customize') }}" class="block px-3 py-2 hover:text-sakura">Design Yours</a>
             <a href="{{ route('support') }}" class="block px-3 py-2 hover:text-sakura">Help & FAQs</a>
-            @if (Session::has('user'))
+            
+            @auth
                 <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
                 <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
                 <a href="{{ route('dashboard') }}" class="block px-3 py-2 hover:text-sakura">Account</a>
             @else
                 <a href="{{ route('auth.page') }}" class="block px-3 py-2 hover:text-sakura font-medium">Login / Sign Up</a>
-            @endif
+            @endguest
         </div>
     </div>
 </header>

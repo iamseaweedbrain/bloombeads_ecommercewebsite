@@ -38,12 +38,10 @@
                         <td>₱{{ number_format($product->price, 2) }}</td>
                         <td>{{ $product->stock }}</td>
                         <td class="space-x-2">
-                            {{-- **UPDATED** Edit button calls JS --}}
                             <button onclick='openEditModal(@json($product))' class="py-1 px-3 text-xs font-poppins font-semibold card-radius text-white bg-sky hover:bg-opacity-80">
                                 Edit
                             </button>
 
-                            {{-- **UPDATED** Delete button is now a form --}}
                             <form action="{{ route('admin.catalog.destroy', $product->id) }}" method="POST" class="inline" onsubmit="return confirm('Are you sure you want to delete this product?');">
                                 @csrf
                                 @method('DELETE')

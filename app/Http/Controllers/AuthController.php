@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
 {
@@ -17,29 +20,22 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'fullName' => 'required|string|max:255',
-            'email'    => 'required|email|max:255',
+            'email'    => 'required|email|max:255|unique:useraccount,email',
             'password' => 'required|string|min:6',
         ]);
-
-        $email = trim($validated['email']);
-
-        if (DB::table('useraccount')->where('email', $email)->exists()) {
-            $message = 'Email already registered.';
-            return $request->expectsJson()
-                ? response()->json(['message' => $message], 409)
-                : redirect()->route('auth.page')->with('login_error', $message);
-        }
-
+        
         try {
-            DB::table('useraccount')->insert([
+            $user = User::create([
                 'fullName'   => $validated['fullName'],
-                'email'      => $email,
+                'email'      => $validated['email'],
                 'password'   => Hash::make($validated['password']),
                 'status'     => 'active',
                 'user_id'    => uniqid('user_'),
-                'created_at' => now(),
-                'updated_at' => now(),
             ]);
+
+            // Create a cart for the new user
+            $user->cart()->create();
+
         } catch (\Exception $e) {
             $message = 'Database error: ' . $e->getMessage();
             return $request->expectsJson()
@@ -55,23 +51,30 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-        $email = trim($credentials['email']); 
-        
-        $user = DB::table('useraccount')->where('email', $email)->first();
+        $credentials = $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        if (!$user) {
-            return redirect()->route('auth.page')
-                            ->with('login_error', 'Invalid login credentials.');
+        if (Auth::attempt($credentials + ['status' => 'active'])) {
+            $request->session()->regenerate();
+            
+            return redirect()->route('dashboard');
         }
 
-        if (!Hash::check($credentials['password'], $user->password)) {
-            return redirect()->route('auth.page')
-                            ->with('login_error', 'Invalid login credentials.');
-        }
+        // If attempt fails
+        return redirect()->route('auth.page')
+                        ->with('login_error', 'Invalid login credentials or inactive account.');
+    }
 
-        session(['user' => $user]);
-        return redirect()->route('dashboard');
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+     
+        $request->session()->regenerateToken();
+     
+        return redirect()->route('auth.page');
     }
 
     /* ===============================

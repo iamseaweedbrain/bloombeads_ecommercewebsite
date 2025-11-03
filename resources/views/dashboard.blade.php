@@ -1,6 +1,6 @@
 <x-layout>
     <div class="p-8">
-        <h1 class="text-2xl font-bold mb-4">Hello, {{ session('user')->fullName }}</h1>
+        <h1 class="text-2xl font-bold mb-4">Hello, {{ Auth::user()->fullName }}</h1>
 
         <form action="{{ route('logout') }}" method="POST">
             @csrf

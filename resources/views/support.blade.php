@@ -43,15 +43,21 @@
                             Contact Our Support Team
                         </h2>
 
-                        <form class="space-y-4">
-                            <input type="text" placeholder="Your Full Name"
+                        <form class="space-y-4" action="{{ route('contact.store') }}" method="POST">
+                            @csrf
+
+                            <input type="text" name="name" placeholder="Your Full Name"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 font-poppins focus:ring-2 focus:ring-black outline-none">
-                            <input type="email" placeholder="Your Email Address"
+
+                            <input type="email" name="email" placeholder="Your Email Address"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 font-poppins focus:ring-2 focus:ring-black outline-none">
-                            <input type="text" placeholder="Subject of Inquiry (e.g. ‘Order #BB1025–001’)"
+
+                            <input type="text" name="subject" placeholder="Subject of Inquiry"
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 font-poppins focus:ring-2 focus:ring-black outline-none">
-                            <textarea placeholder="Please describe your issue or question here..." rows="4"
+
+                            <textarea name="message" rows="4" placeholder="Please describe your issue..."
                                 class="w-full border border-gray-300 rounded-xl px-4 py-3 font-poppins focus:ring-2 focus:ring-black outline-none resize-none"></textarea>
+
                             <button type="submit"
                                 class="w-full py-3 bg-sakura text-white font-fredoka font-bold rounded-xl hover:bg-sakura/90 transition">
                                 SEND MESSAGE

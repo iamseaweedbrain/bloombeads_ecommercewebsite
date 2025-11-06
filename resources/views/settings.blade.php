@@ -1,96 +1,73 @@
-@extends('layouts.app')
+<x-layout>
+    <section id="settings-view" class="py-12 md:py-16">
+        <!-- H2: Fredoka Bold -->
+        <h2 class="text-3xl font-fredoka font-bold mb-8 md:mb-12">Account Settings</h2>
 
-@section('title', 'Account Settings')
+        <div class="md:grid md:grid-cols-4 gap-8">
+            <!-- Left Sidebar: Tabs (Account Management) -->
+            <aside class="md:col-span-1">
+                <div class="bg-white p-4 card-radius shadow-soft sticky top-20">
+                    <!-- Tab: Profile Info (Account Mgmt) -->
+                    <button id="tab-btn-settings-profile-info" onclick="setSettingsTab('profile-info')" class="settings-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2 bg-sakura text-white">Profile Information</button>
+                    <!-- Tab: Password Change -->
+                    <button id="tab-btn-settings-password" onclick="setSettingsTab('password')" class="settings-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2 bg-neutral text-dark hover:bg-gray-200">Password Change</button>
+                </div>
+            </aside>
 
-@section('content')
-<div class="bg-white min-h-screen text-gray-800">
-    <!-- Header -->
-    <header class="flex items-center justify-between px-10 py-4 border-b shadow-sm">
-        <h1 class="text-2xl font-extrabold text-pink-500">Bloombeads</h1>
-        <nav class="space-x-6 text-gray-700 font-medium">
-            <a href="{{ route('dashboard') }}" class="hover:text-pink-500">Dashboard</a>
-            <a href="{{ route('logout') }}" class="hover:text-pink-500">Logout</a>
-        </nav>
-    </header>
-
-    <div class="max-w-3xl mx-auto mt-10">
-        <h2 class="text-3xl font-bold text-gray-700 mb-6">Account Settings</h2>
-
-        <!-- Success / Error Messages -->
-        @if (session('success'))
-            <div class="bg-green-100 text-green-800 p-3 rounded-lg mb-4">{{ session('success') }}</div>
-        @endif
-        @if (session('error'))
-            <div class="bg-red-100 text-red-800 p-3 rounded-lg mb-4">{{ session('error') }}</div>
-        @endif
-
-        <!-- PROFILE UPDATE FORM -->
-        <div class="bg-gray-50 p-6 rounded-2xl shadow mb-8">
-            <h3 class="text-xl font-semibold mb-4 text-pink-500">Profile Information</h3>
-
-            <form method="POST" action="{{ route('settings.profile.update') }}">
-                @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Full Name</label>
-                    <input type="text" name="fullName" value="{{ old('fullName', session('user')->fullName ?? '') }}" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
+            <!-- Right Content Area (3/4 width) -->
+            <div class="md:col-span-3 bg-white p-8 card-radius shadow-soft mt-8 md:mt-0">
+                
+                <!-- Settings Profile Info Content (Account Data) -->
+                <div id="settings-profile-info-content">
+                    <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">Account Profile (Name, Email, etc.)</h3>
+                    <form action="{{ route('profile.update') }}" method="POST" class="space-y-4 font-poppins">
+                        @csrf
+                        <input type="text" name="fullName" placeholder="Full Name" value="{{ auth()->user()->fullName }}" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150">
+                        <input type="email" name="email" placeholder="Email" value="{{ auth()->user()->email }}" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150">
+                        <input type="number" name="contact_number" placeholder="Contact Number" value="{{ auth()->user()->contact_number }}"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150">
+                        <input type="text" name="address" placeholder="Shipping Address" value="{{ auth()->user()->address }}"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150">
+                        <button type="submit" class="mt-4 py-2 px-6 font-poppins font-semibold card-radius text-white bg-sky hover:bg-opacity-80 transition-default">Save Profile Changes</button>
+                    </form>
                 </div>
 
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Email</label>
-                    <input type="email" name="email" value="{{ old('email', session('user')->email ?? '') }}" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
+                <!-- Settings Password Change Content -->
+                <div id="settings-password-content" class="hidden">
+                    <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">Change Password</h3>
+                    <form action="{{ route('password.update') }}" method="POST" class="space-y-4 font-poppins max-w-sm">
+                        @csrf
+                        <input type="password" name="current_password" placeholder="Current Password" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150">
+                        <input type="password" name="new_password" placeholder="New Password" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150">
+                        <input type="password" name="new_password_confirmation" placeholder="Confirm New Password" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150">
+                        <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
+                            UPDATE PASSWORD
+                        </button>
+                    </form>
                 </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Phone (optional)</label>
-                    <input type="text" name="phone" value="{{ old('phone', session('user')->phone ?? '') }}" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Birthday (optional)</label>
-                    <input type="date" name="birthday" value="{{ old('birthday', session('user')->birthday ?? '') }}" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
-                </div>
-
-                <button type="submit" 
-                    class="bg-pink-500 hover:bg-pink-600 text-white font-medium px-5 py-2 rounded-lg transition">
-                    Update Profile
-                </button>
-            </form>
+            </div>
         </div>
+    </section>
+    
+    <script>
+        function setSettingsTab(tabId) {
+            currentSettingsTab = tabId;
+            document.getElementById('settings-profile-info-content').classList.add('hidden');
+            document.getElementById('settings-password-content').classList.add('hidden');
+            
+            document.getElementById('settings-' + tabId + '-content').classList.remove('hidden');
 
-        <!-- PASSWORD UPDATE FORM -->
-        <div class="bg-gray-50 p-6 rounded-2xl shadow">
-            <h3 class="text-xl font-semibold mb-4 text-pink-500">Change Password</h3>
-
-            <form method="POST" action="{{ route('settings.password.update') }}">
-                @csrf
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Current Password</label>
-                    <input type="password" name="current_password" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">New Password</label>
-                    <input type="password" name="new_password" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1">Confirm New Password</label>
-                    <input type="password" name="new_password_confirmation" 
-                        class="w-full border rounded-lg p-2 focus:ring-2 focus:ring-pink-400">
-                </div>
-
-                <button type="submit" 
-                    class="bg-pink-500 hover:bg-pink-600 text-white font-medium px-5 py-2 rounded-lg transition">
-                    Update Password
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-@endsection
+            document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+                btn.classList.remove('bg-sakura', 'text-white');
+                btn.classList.add('bg-neutral', 'text-dark');
+            });
+            document.getElementById('tab-btn-settings-' + tabId).classList.remove('bg-neutral', 'text-dark');
+            document.getElementById('tab-btn-settings-' + tabId).classList.add('bg-sakura', 'text-white');
+        }
+    </script>
+</x-layout>

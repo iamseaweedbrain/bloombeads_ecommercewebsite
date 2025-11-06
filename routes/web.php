@@ -13,7 +13,8 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\ForgotPasswordOtpController;
-
+use App\Http\Controllers\SupportMessageController;
+use App\Models\SupportMessage;
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
 Route::post('/auth/signup', [AuthController::class, 'signUp'])->name('auth.signup');
@@ -30,7 +31,12 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 Route::view('/', 'homepage')->name('homepage');
 Route::get('/browsecatalog', [ProductController::class, 'index'])->name('browsecatalog');
 Route::view('/customize', 'customize')->name('customize');
+
 Route::view('/support', 'support')->name('support');
+Route::post('/contact/submit', [SupportMessageController::class, 'store'])->name('contact.store');
+
+Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
+Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('password.update');
 
 Route::middleware('auth')->group(function () {
 
@@ -84,9 +90,7 @@ Route::middleware('session.user')->prefix('admin')->name('admin.')->group(functi
     Route::get('/approvals', function() {
         return view('admin.approvals');
     })->name('approvals');
-
-    Route::get('/notifications', function() {
-        return view('admin.notifications');
-    })->name('notifications');
-
+    
+    Route::get('/notifications', [SupportMessageController::class, 'notifications'])
+        ->name('notifications');
 });

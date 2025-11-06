@@ -22,6 +22,8 @@ class AuthController extends Controller
             'fullName' => 'required|string|max:255',
             'email'    => 'required|email|max:255|unique:useraccount,email',
             'password' => 'required|string|min:6',
+            'contact_number' => 'nullable|string|max:20',
+            'address'        => 'nullable|string|max:255',
         ]);
         
         try {
@@ -30,7 +32,8 @@ class AuthController extends Controller
                 'email'      => $validated['email'],
                 'password'   => Hash::make($validated['password']),
                 'status'     => 'active',
-                'user_id'    => uniqid('user_'),
+                'contact_number'  => $validated['contact_number'] ?? null,
+                'address'         => $validated['address'] ?? null,
             ]);
 
             // Create a cart for the new user
@@ -77,32 +80,30 @@ class AuthController extends Controller
         return redirect()->route('auth.page');
     }
 
-    /* ===============================
-       SETTINGS: UPDATE PROFILE
-       =============================== */
     public function updateProfile(Request $request)
     {
-        $user = session('user');
+        $user = Auth::user();
         if (!$user) {
             return redirect()->route('auth.page')->with('login_error', 'Please log in first.');
         }
 
         $validated = $request->validate([
             'fullName' => 'required|string|max:255',
-            'email'    => 'required|email|max:255',
-            'phone'    => 'nullable|string|max:20',
-            'birthday' => 'nullable|date',
+            'email' => 'required|email|max:255',
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:255',
+            
         ]);
 
         try {
             DB::table('useraccount')
                 ->where('user_id', $user->user_id)
                 ->update([
-                    'fullName' => $validated['fullName'],
-                    'email'    => $validated['email'],
-                    'phone'    => $validated['phone'] ?? null,
-                    'birthday' => $validated['birthday'] ?? null,
-                    'updated_at' => now(),
+                    'fullName'        => $validated['fullName'],
+                    'email'           => $validated['email'],
+                    'contact_number'  => $validated['contact_number'] ?? null,
+                    'address'         => $validated['address'] ?? null,
+                    'updated_at'      => now()
                 ]);
 
             // Refresh session
@@ -120,7 +121,7 @@ class AuthController extends Controller
        =============================== */
     public function updatePassword(Request $request)
     {
-        $user = session('user');
+        $user = Auth::user();
         if (!$user) {
             return redirect()->route('auth.page')->with('login_error', 'Please log in first.');
         }
@@ -141,6 +142,10 @@ class AuthController extends Controller
                     'password' => Hash::make($validated['new_password']),
                     'updated_at' => now(),
                 ]);
+
+            if (is_object($user)) {
+                $user->password = Hash::make($validated['new_password']);
+            }
 
             return back()->with('success', 'Password updated successfully.');
         } catch (\Exception $e) {

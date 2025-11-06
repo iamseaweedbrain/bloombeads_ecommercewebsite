@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('username', 100)->unique();
             $table->string('email', 100)->unique();
             $table->string('password', 255);
+            $table->string('contact_number', 20)->nullable();
+            $table->text('address')->nullable();
             $table->string('status', 20)->default('active');
             $table->timestamp('date_joined')->useCurrent();
             

@@ -32,6 +32,9 @@ Route::get('/browsecatalog', [ProductController::class, 'index'])->name('browsec
 Route::view('/customize', 'customize')->name('customize');
 Route::view('/support', 'support')->name('support');
 
+Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
+Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('password.update');
+
 Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', function () {

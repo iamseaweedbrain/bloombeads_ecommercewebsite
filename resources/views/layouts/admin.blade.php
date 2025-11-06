@@ -8,11 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    @vite('resources/css/admin.css')
-    @vite('public/js/admin.js', 'defer')
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <script>
-        tailwind.config = {
+        tailwind.config = { 
             theme: {
                 extend: {
                     colors: {

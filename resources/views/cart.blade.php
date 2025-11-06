@@ -1,164 +1,290 @@
 <x-layout>
-<section class="px-6 py-8 bg-gray-50 min-h-screen">
-    <main class="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        {{-- 🛒 Left: Cart Items --}}
-        <div class="md:col-span-2 bg-white shadow-md rounded-2xl p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">Your Shopping Cart</h1>
-
-            {{-- Cart Items --}}
-            <div id="cartContainer">
-                @foreach($cartItems as $item)
-                <div class="cart-item flex items-center justify-between bg-white border rounded-xl shadow-sm p-4 mb-4 transition duration-300">
-                    <div class="flex items-center gap-4">
-                        {{-- Badge (Custom / Key) --}}
-                        <div class="w-14 h-14 flex items-center justify-center rounded-xl text-white font-semibold 
-                            {{ $loop->index == 0 ? 'bg-pink-400' : 'bg-cyan-500' }}">
-                            {{ $loop->index == 0 ? 'Custom' : 'Key' }}
-                        </div>
-
-                        {{-- Item Info --}}
-                        <div>
-                            <h2 class="font-semibold text-gray-900">{{ $item['name'] }}</h2>
-
-                            @if($loop->index == 0)
-                                <p class="text-sm text-gray-600">Base price: ₱{{ number_format($item['price'], 2) }}</p>
-                            @else
-                                <p class="text-sm text-gray-600">Category: Collectibles</p>
-                            @endif
-
-                            <p class="font-bold text-pink-500 mt-1">₱{{ number_format($item['price'], 2) }}</p>
-                        </div>
-                    </div>
-
-                    {{-- Right side: Quantity + Delete --}}
-                    <div class="flex items-center gap-4">
-                        {{-- Quantity box --}}
-                        <div class="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                            <div class="px-3 py-1.5 bg-white font-semibold text-gray-800 text-center min-w-[38px] quantity-value">
-                                {{ $item['quantity'] }}
-                            </div>
-                            <div class="flex flex-col bg-gray-100">
-                                <button class="arrow-btn up text-gray-600 hover:text-gray-800 text-[10px] leading-none px-1 py-0.5" data-action="increase">▲</button>
-                                <button class="arrow-btn down text-gray-600 hover:text-gray-800 text-[10px] leading-none px-1 py-0.5" data-action="decrease">▼</button>
-                            </div>
-                        </div>
-
-                        {{-- Delete button --}}
-                        <button class="text-black hover:text-pink-500 delete-btn transition duration-150" title="Remove item">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-9 0h10" />
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-                @endforeach
+    <section id="cart-view" 
+             class="py-12 md:py-16 bg-neutral"
+             data-cart-remove-url="{{ route('cart.remove') }}"
+             data-cart-update-url="{{ route('cart.update.quantity') }}">
+        
+        <h2 class="text-3xl font-fredoka font-bold mb-8"> Your Shopping Cart </h2>
+        
+        @if(session('error'))
+            <div class="md:col-span-3 bg-sakura/10 text-sakura p-4 card-radius font-poppins mb-4">
+                {{ session('error') }}
             </div>
+        @endif
+        
+        <div class="md:grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-2 space-y-4" id="cartContainer">
 
-            {{-- 🩶 Empty Cart Message --}}
-            <div id="emptyCartMessage" class="hidden text-center py-10 text-gray-600">
-                <p class="text-lg font-semibold mb-3">🛒 Your cart is empty.</p>
-                <a href="{{ url('/browsecatalog') }}" 
-                   class="inline-block bg-pink-400 hover:bg-pink-500 text-white px-6 py-3 rounded-lg font-semibold transition">
-                   Continue Browsing
+                @forelse ($cartItems as $item)
+                    <div
+                        class="cart-item bg-white p-4 card-radius shadow-soft flex items-center space-x-4 border border-neutral hover:border-sakura/40 transition-all duration-300"
+                        data-cart-item-id="{{ $item['cart_item_id'] }}"
+                        data-price="{{ $item['price'] ?? 0 }}"> 
+                        
+                        <input type="checkbox" 
+                               class="item-checkout-checkbox h-5 w-5 rounded text-cta focus:ring-cta border-neutral/50 flex-shrink-0"
+                               checked>
+
+                        <img src="{{ $item['image_path'] ? asset('storage/' . $item['image_path']) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}" 
+                             alt="{{ $item['name'] ?? 'Product Image' }}" 
+                             class="w-20 h-20 flex-shrink-0 card-radius object-cover bg-gray-100">
+
+                        <div class="flex-grow">
+                            <h4 class="font-poppins font-semibold text-dark">{{ $item['name'] ?? 'Product Name' }}</h4>
+                            <p class="text-sm font-poppins text-dark/70">Category: {{ $item['category'] ?? 'N/A' }}</p>
+                            <p class="font-poppins font-bold text-lg text-sakura mt-1">
+                                ₱{{ number_format($item['price'] ?? 0, 2) }}
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center space-x-3">
+                            
+                            <div class="flex items-center border border-neutral rounded-lg overflow-hidden">
+                                <button
+                                    class="quantity-btn p-2 text-dark hover:bg-neutral/70"
+                                    data-action="decrease"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+                                </button>
+                                <div
+                                    class="px-3 py-1.5 bg-white font-semibold text-dark text-center min-w-[38px] quantity-value"
+                                    data-quantity="{{ $item['quantity'] ?? 1 }}"
+                                >
+                                    {{ $item['quantity'] ?? 1 }}
+                                </div>
+                                <button
+                                    class="quantity-btn p-2 text-dark hover:bg-neutral/70"
+                                    data-action="increase"
+                                >
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                </button>
+                            </div>
+
+                            <button
+                                class="text-dark hover:text-sakura p-1 rounded-full hover:bg-neutral/70 transition-all delete-btn"
+                                title="Remove item">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 011-1h4a1 1 0 011 1v3m-9 0h10" /></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                @empty
+                    <div id="emptyCartMessage" class="text-center py-10 text-dark/70">
+                        <p class="text-lg font-fredoka mb-3">🛒 Your cart is empty.</p>
+                        <a href="{{ route('browsecatalog') }}"
+                           class="inline-block bg-sakura hover:bg-sakura/90 text-white px-6 py-3 card-radius font-semibold shadow-soft transition-default">
+                            Continue Browsing
+                        </a>
+                    </div>
+                @endforelse
+
+            </div>
+            
+            {{-- Order Summary --}}
+            <div
+                class="md:col-span-1 bg-white p-6 card-radius shadow-soft mt-8 md:mt-0 sticky top-20 h-fit border border-neutral">
+                <h3 class="text-xl font-fredoka font-bold border-b pb-3 mb-4 text-sky">Order Summary</h3>
+                <div class="space-y-2 font-poppins text-dark">
+                    <p class="flex justify-between">Subtotal: <span class="subtotal">₱0.00</span></p>
+                    <p class="flex justify-between">Shipping: <span class="shipping">₱0.00</span></p>
+                    <p class="flex justify-between font-bold text-lg pt-2 border-t border-neutral">Total: <span class="total text-sakura">₱0.00</span></p>
+                </div>
+                
+                <button id="checkoutBtn"
+                        class="mt-6 w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 shadow-soft transform hover:scale-[1.02] transition-all duration-300
+                        opacity-50 cursor-not-allowed"
+                        disabled>
+                    PROCEED TO CHECKOUT
+                </button>
+                
+                <a href="{{ url('/browsecatalog') }}"
+                   class="block mt-3 w-full text-center py-3 font-poppins card-radius text-dark border border-neutral hover:bg-neutral/70 transition-all duration-300">
+                    CONTINUE BROWSING
                 </a>
             </div>
         </div>
 
-        {{-- 💳 Right: Order Summary --}}
-        <div class="bg-white shadow-md rounded-2xl p-6">
-            <h2 class="text-lg font-bold text-cyan-500 mb-4">Order Summary</h2>
+        <form id="checkoutForm" action="{{ route('cart.proceed') }}" method="POST" class="hidden">
+            @csrf
+            <input type="hidden" name="selected_items" id="selectedItemsInput">
+        </form>
 
-            @php
-                $subtotal = collect($cartItems)->sum(fn($i) => $i['price'] * $i['quantity']);
-                $shipping = 10.00;
-                $total = $subtotal + $shipping;
-            @endphp
+    </section>
 
-            <div class="flex justify-between text-gray-700 mb-2">
-                <span>Subtotal:</span>
-                <span class="subtotal">₱{{ number_format($subtotal, 2) }}</span>
-            </div>
-            <div class="flex justify-between text-gray-700 mb-2">
-                <span>Shipping:</span>
-                <span class="shipping">₱{{ number_format($shipping, 2) }}</span>
-            </div>
-            <div class="flex justify-between font-bold text-lg text-gray-900 mt-4 border-t pt-2">
-                <span>Total:</span>
-                <span class="total text-pink-500">₱{{ number_format($total, 2) }}</span>
-            </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const cartView = document.getElementById('cart-view');
+        const removeUrl = cartView.dataset.cartRemoveUrl; 
+        const updateUrl = cartView.dataset.cartUpdateUrl;
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const checkoutForm = document.getElementById('checkoutForm');
+        const selectedItemsInput = document.getElementById('selectedItemsInput');
 
-            {{-- Buttons --}}
-            <button id="checkoutBtn"
-                class="mt-6 w-full bg-orange-400 hover:bg-orange-500 text-white py-3 rounded-lg font-semibold transition">
-                PROCEED TO CHECKOUT
-            </button>
+        //The Total Calculation Function ---
+        const updateTotals = () => {
+            const items = document.querySelectorAll('.cart-item');
+            const checkoutBtn = document.getElementById('checkoutBtn');
+            let subtotal = 0;
+            let checkedItemCount = 0;
 
-            <a href="{{ url('/browsecatalog') }}"
-                class="block mt-3 w-full text-center border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
-                CONTINUE BROWSING
-            </a>
-        </div>
-    </main>
-</section>
+            items.forEach(item => {
+                const checkbox = item.querySelector('.item-checkout-checkbox');
+                if (!checkbox || !checkbox.checked) {
+                    return; 
+                }
+                
+                checkedItemCount++;
+                const price = parseFloat(item.dataset.price);
+                const qtyEl = item.querySelector('.quantity-value');
+                const qty = parseInt(qtyEl.dataset.quantity);
+                subtotal += price * qty;
+            });
 
-{{-- ✨ JavaScript --}}
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const updateTotals = () => {
-        const items = document.querySelectorAll('.cart-item');
-        let subtotal = 0;
-        items.forEach(item => {
-            const priceText = item.querySelector('.font-bold.text-pink-500').textContent.replace(/[₱,]/g, '');
-            const qty = parseInt(item.querySelector('.quantity-value').textContent);
-            subtotal += parseFloat(priceText) * qty;
+            const shipping = checkedItemCount > 0 ? 10.00 : 0.00;
+            const total = subtotal + shipping;
+
+            document.querySelector('.subtotal').textContent = '₱' + subtotal.toFixed(2);
+            document.querySelector('.shipping').textContent = '₱' + shipping.toFixed(2);
+            document.querySelector('.total').textContent = '₱' + total.toFixed(2);
+            
+            if (checkedItemCount === 0) {
+                checkoutBtn.disabled = true;
+                checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                checkoutBtn.disabled = false;
+                checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+        };
+
+        //Listen for Checkbox Clicks ---
+        document.querySelectorAll('.item-checkout-checkbox').forEach(checkbox => {
+            checkbox.addEventListener('change', updateTotals);
         });
-        const shipping = 10.00;
-        const total = subtotal + (items.length > 0 ? shipping : 0);
 
-        document.querySelector('.subtotal').textContent = '₱' + subtotal.toFixed(2);
-        document.querySelector('.total').textContent = '₱' + total.toFixed(2);
-    };
-
-    const checkEmptyCart = () => {
-        const container = document.getElementById('cartContainer');
-        const emptyMsg = document.getElementById('emptyCartMessage');
-        if (container.children.length === 0) {
-            container.classList.add('hidden');
-            emptyMsg.classList.remove('hidden');
+        //Checkout Button Click ---
+        if (checkoutBtn) {
+            checkoutBtn.addEventListener('click', (e) => {
+                e.preventDefault(); 
+                if(checkoutBtn.disabled) return;
+                const selectedItems = [];
+                document.querySelectorAll('.item-checkout-checkbox:checked').forEach(cb => {
+                    const itemRow = cb.closest('.cart-item');
+                    selectedItems.push(itemRow.dataset.cartItemId);
+                });
+                selectedItemsInput.value = JSON.stringify(selectedItems);
+                checkoutForm.submit();
+            });
         }
-    };
 
-    document.querySelectorAll('.arrow-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const action = this.dataset.action;
-            const qtyDisplay = this.closest('.flex.items-center.border').querySelector('.quantity-value');
-            let qty = parseInt(qtyDisplay.textContent);
+        //Delete Button Logic ---
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const itemRow = this.closest('.cart-item');
+                const cartItemId = itemRow.dataset.cartItemId; 
 
-            if (action === 'increase') qty++;
-            else if (action === 'decrease' && qty > 1) qty--;
-
-            qtyDisplay.textContent = qty;
-            updateTotals();
+                if (!removeUrl || !cartItemId || !csrfToken) {
+                    console.error('Missing data for delete');
+                    return;
+                }
+                
+                fetch(removeUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: new URLSearchParams({
+                        'cart_item_id': cartItemId,
+                        '_token': csrfToken
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        itemRow.classList.add('opacity-0', 'scale-95', 'transition-all', 'duration-200');
+                        setTimeout(() => {
+                            itemRow.remove();
+                            updateTotals();
+                            checkEmptyCart();
+                        }, 200);
+                    } else {
+                        alert(data.message || 'Error removing item.');
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+            });
         });
-    });
+        
+        //Quantity Button Logic ---
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const action = this.dataset.action;
+                const itemRow = this.closest('.cart-item');
+                const cartItemId = itemRow.dataset.cartItemId;
+                const qtyEl = itemRow.querySelector('.quantity-value');
+                
+                let currentQty = parseInt(qtyEl.dataset.quantity);
 
-    document.querySelectorAll('.delete-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const itemRow = this.closest('.cart-item');
-            itemRow.classList.add('opacity-0', 'scale-95');
-            setTimeout(() => {
-                itemRow.remove();
-                updateTotals();
-                checkEmptyCart();
-            }, 200);
+                if (action === 'increase') {
+                    currentQty++;
+                } else if (action === 'decrease' && currentQty > 1) {
+                    currentQty--;
+                } else {
+                    return;
+                }
+
+                qtyEl.textContent = currentQty;
+                qtyEl.dataset.quantity = currentQty;
+                updateTotals(); // Re-calculate totals
+
+                fetch(updateUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify({
+                        cart_item_id: cartItemId,
+                        quantity: currentQty
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        console.error('Failed to update quantity on server.');
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+            });
         });
-    });
 
-    document.getElementById('checkoutBtn').addEventListener('click', () => {
-        window.location.href = "{{ route('payment') }}";
+        const checkEmptyCart = () => {
+            const container = document.getElementById('cartContainer');
+            if (!container) return;
+            const items = container.querySelectorAll('.cart-item');
+            let emptyMsg = container.querySelector('#emptyCartMessage');
+            
+            if (items.length === 0 && !emptyMsg) {
+                container.innerHTML = `
+                    <div id="emptyCartMessage" class="text-center py-10 text-dark/70">
+                        <p class="text-lg font-fredoka mb-3">🛒 Your cart is empty.</p>
+                        <a href="{{ route('browsecatalog') }}"
+                           class="inline-block bg-sakura hover:bg-sakura/90 text-white px-6 py-3 card-radius font-semibold shadow-soft transition-default">
+                            Continue Browsing
+                        </a>
+                    </div>`;
+            } else if (items.length > 0 && emptyMsg) {
+                emptyMsg.remove();
+            }
+        };
+
+        updateTotals();
     });
-});
-</script>
+    </script>
 </x-layout>

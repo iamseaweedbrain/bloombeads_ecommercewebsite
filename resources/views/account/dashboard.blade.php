@@ -16,7 +16,10 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6 border border-pink-50">
                     <nav class="space-y-3">
                         <a href="{{ route('account.dashboard') }}"
-                           class="block px-3 py-2 rounded-lg font-medium transition 
+                php artisan view:clear
+php artisan cache:clear
+php artisan config:clear
+           class="block px-3 py-2 rounded-lg font-medium transition 
                            {{ request()->routeIs('account.dashboard') 
                               ? 'bg-rose-100 text-rose-700 font-semibold shadow-sm' 
                               : 'hover:bg-rose-100 hover:text-rose-700 text-gray-700' }}">

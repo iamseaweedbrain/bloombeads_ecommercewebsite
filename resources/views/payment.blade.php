@@ -1,74 +1,136 @@
 <x-layout>
-<section class="px-6 py-8 bg-gray-50 min-h-screen">
-    <main class="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+
+    @php
+        $total = session('checkout_total', 0);
+        $shipping = 10.00;
+        $subtotal = $total > 0 ? $total - $shipping : 0; 
+    @endphp
+
+    <section class="px-6 py-12 bg-neutral min-h-screen">
+        <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+
+            @if(session('error'))
+                <div class="md:col-span-3 bg-sakura/10 text-sakura p-4 card-radius font-poppins mb-6">
+                    {{ session('error') }}
+                </div>
+            @endif
+            
+            {{-- Payment Method Selection --}}
+            <div class="md:col-span-2 bg-white shadow-soft card-radius p-8 border border-neutral/50">
+                <h1 class="text-3xl font-fredoka font-bold mb-8">Select Payment Method</h1>
+
+                <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
+                    @csrf
+                    <input type="hidden" name="total_amount" value="{{ $total }}">
+                    
+                    <div class="space-y-4">
+                        
+                        {{-- Cash on Delivery --}}
+                        <div>
+                            <input type="radio" name="payment_method" id="pay-cod" value="cod" class="hidden peer" checked>
+                            <label for="pay-cod" 
+                                    class="flex items-center border border-neutral rounded-xl p-5 cursor-pointer peer-checked:border-sakura peer-checked:ring-2 peer-checked:ring-sakura/50 peer-checked:bg-sakura/5 transition-all duration-300">
+                                <div class="text-sky font-bold text-xl w-14 text-center">COD</div>
+                                <div class="ml-3">
+                                    <h2 class="font-fredoka font-semibold text-dark">Cash on Delivery</h2>
+                                    <p class="text-sm text-dark/70 font-poppins">Pay in cash when your order is delivered.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- Option 2: GCash --}}
+                        <div>
+                            <input type="radio" name="payment_method" id="pay-gcash" value="gcash" class="hidden peer">
+                            <label for="pay-gcash" 
+                                    class="flex items-center border border-neutral rounded-xl p-5 cursor-pointer peer-checked:border-sky peer-checked:ring-2 peer-checked:ring-sky/50 peer-checked:bg-sky/5 transition-all duration-300">
+                                <div class="text-sky font-bold text-2xl w-12 text-center">G</div>
+                                <div class="ml-3">
+                                    <h2 class="font-fredoka font-semibold text-dark">GCash (E-Wallet)</h2>
+                                    <p class="text-sm text-dark/70 font-poppins">Pay easily using your mobile wallet.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        {{-- Option 3: Maya --}}
+                        <div>
+                            <input type="radio" name="payment_method" id="pay-maya" value="maya" class="hidden peer">
+                            <label for="pay-maya" 
+                                    class="flex items-center border border-neutral rounded-xl p-5 cursor-pointer peer-checked:border-sakura peer-checked:ring-2 peer-checked:ring-sakura/50 peer-checked:bg-sakura/5 transition-all duration-300">
+                                <div class="text-sakura font-bold text-2xl w-12 text-center">M</div>
+                                <div class="ml-3">
+                                    <h2 class="font-fredoka font-semibold text-dark">Maya (E-Wallet)</h2>
+                                    <p class="text-sm text-dark/70 font-poppins">Instant payment via Maya account or card.</p>
+                                </div>
+                            </label>
+                        </div>
+
+                        <button type="button" id="placeOrderBtn"
+                                class="mt-8 w-full bg-cta hover:bg-opacity-90 text-white py-3 card-radius font-fredoka font-bold shadow-soft transform hover:scale-[1.02] transition-all duration-300">
+                            PLACE ORDER
+                        </button>
+                    </div>
+                </form> </div>
+
+            {{-- Order Summary --}}
+            <div class="bg-white shadow-soft card-radius p-8 border border-neutral/50 h-fit md:sticky md:top-24">
+                <h2 class="text-xl font-fredoka font-bold text-sky mb-6">Order Summary</h2>
+
+                <div class="font-poppins text-dark/80">
+                    <div class="flex justify-between mb-2">
+                        <span>Subtotal:</span>
+                        <span class="font-semibold">₱{{ number_format($subtotal, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Shipping:</span>
+                        <span class="font-semibold">₱{{ number_format($shipping, 2) }}</span>
+                    </div>
+
+                    <hr class="border-neutral/70 my-4">
+
+                    <div class="flex justify-between font-bold text-lg text-dark">
+                        <span>Total Due:</span>
+                        <span class="text-sakura">₱{{ number_format($total, 2) }}</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <div id="payment-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50 hidden">
         
-        {{-- 🧾 Left: Payment Options --}}
-        <div class="md:col-span-2 bg-white shadow-md rounded-2xl p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-6">Select Payment Method</h1>
+        <div id="modal-backdrop" class="absolute inset-0"></div>
 
-            {{-- Payment Confirmed Notice --}}
-            <p class="text-center mb-4">
-                <span class="text-cyan-500 font-semibold">Payment Confirmed!</span>
-                <span class="text-gray-700">Thank you for your order.</span>
-            </p>
-
-            {{-- 💙 GCash --}}
-            <div class="flex items-center border-2 border-pink-400 rounded-xl p-4 mb-4">
-                <div class="text-cyan-500 font-bold text-2xl w-10 text-center">G</div>
-                <div class="ml-3">
-                    <h2 class="font-semibold text-gray-800">GCash (E-Wallet)</h2>
-                    <p class="text-sm text-gray-600">Pay easily using your mobile wallet.</p>
-                </div>
-            </div>
-
-            {{-- 💗 Maya --}}
-            <div class="flex items-center border border-gray-200 rounded-xl p-4 mb-4 hover:border-pink-400 transition">
-                <div class="text-pink-500 font-bold text-2xl w-10 text-center">M</div>
-                <div class="ml-3">
-                    <h2 class="font-semibold text-gray-800">Maya (E-Wallet)</h2>
-                    <p class="text-sm text-gray-600">Instant payment via Maya account or card.</p>
-                </div>
-            </div>
-
-            {{-- 🟧 COD --}}
-            <div class="flex items-center border border-gray-200 rounded-xl p-4 hover:border-pink-400 transition">
-                <div class="text-yellow-500 font-bold text-xl w-12 text-center">COD</div>
-                <div class="ml-3">
-                    <h2 class="font-semibold text-gray-800">Cash on Delivery</h2>
-                    <p class="text-sm text-gray-600">Pay in cash when your order is delivered.</p>
-                </div>
-            </div>
-
-            {{-- 💳 Place Order Button --}}
-            <button id="placeOrderBtn"
-                class="mt-6 w-full bg-pink-400 hover:bg-pink-500 text-white py-3 rounded-lg font-semibold transition">
-                PLACE ORDER & PAY ₱45.00
+        <div class="bg-white p-6 md:p-8 card-radius shadow-soft w-full max-w-md relative">
+            
+            <button id="close-modal-btn" type="button" class="absolute top-4 right-4 text-dark/50 hover:text-sakura transition-default">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-        </div>
 
-        {{-- 🧾 Right: Order Summary --}}
-        <div class="bg-white shadow-md rounded-2xl p-6">
-            <h2 class="text-lg font-bold text-cyan-500 mb-4">Order Summary</h2>
-            <div class="flex justify-between text-gray-700 mb-2">
-                <span>Subtotal (2 items):</span>
-                <span>₱35.00</span>
+            {{-- GCash QR Code Content --}}
+            <div id="gcash-qr-content" class="hidden text-center">
+                <h3 class="font-fredoka font-bold text-lg text-sky mb-2">Pay with GCash</h3>
+                <p class="font-poppins text-sm text-dark/80 mb-4">Please scan the QR code below to pay <strong class="text-dark">₱{{ number_format($total, 2) }}</strong>.</p>
+                <div class="flex justify-center">
+                    <img src="{{ asset('images/gcash_qr.png') }}" alt="GCash QR Code" class="w-full max-w-xs h-auto border rounded-md">
+                </div>
+                <p class="font-poppins text-xs text-dark/60 mt-4">After paying, click "I Have Paid" below.</p>
             </div>
-            <div class="flex justify-between text-gray-700 mb-2">
-                <span>Shipping:</span>
-                <span>₱10.00</span>
-            </div>
-            <div class="flex justify-between font-bold text-lg text-gray-900 mt-4 border-t pt-2">
-                <span>Total Due:</span>
-                <span class="text-pink-500">₱45.00</span>
-            </div>
-        </div>
-    </main>
-</section>
 
-<script>
-document.getElementById('placeOrderBtn').addEventListener('click', () => {
-    // Redirect to homepage after placing order
-    window.location.href = "{{ url('/') }}";
-});
-</script>
+            {{-- Maya QR Code Content --}}
+            <div id="maya-qr-content" class="hidden text-center">
+                <h3 class="font-fredoka font-bold text-lg text-sakura mb-2">Pay with Maya</h3>
+                <p class="font-poppins text-sm text-dark/80 mb-4">Please scan the QR code below to pay <strong class="text-dark">₱{{ number_format($total, 2) }}</strong>.</p>
+                <div class="flex justify-center">
+                    <img src="{{ asset('images/maya qr.png') }}" alt="Maya QR Code" class="w-full max-w-xs h-auto border rounded-md">
+                </div>
+                <p class="font-poppins text-xs text-dark/60 mt-4">After paying, click "I Have Paid" below.</p>
+            </div>
+
+            <button type="button" id="i-have-paid-btn" class="mt-6 w-full bg-cta hover:bg-opacity-90 text-white py-3 card-radius font-fredoka font-bold shadow-soft">
+                I HAVE PAID, PLACE ORDER
+            </button>
+
+        </div>
+    </div>
+    <script src="{{ asset('js/payment.js') }}"></script>
 </x-layout>

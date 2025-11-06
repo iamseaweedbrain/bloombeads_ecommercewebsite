@@ -4,7 +4,7 @@
 
     use Closure;
     use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\Session; // <-- Import the Session facade
+    use Illuminate\Support\Facades\Session;
     use Symfony\Component\HttpFoundation\Response;
 
     class CheckUserSession
@@ -16,12 +16,10 @@
          */
         public function handle(Request $request, Closure $next): Response
         {
-            if (!Session::has('admin_user')) {
-                
+            if (!Session::has('admin_users')) { 
                 return redirect()->route('admin.login.form');
             }
-            
+
             return $next($request);
         }
     }
-    

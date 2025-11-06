@@ -13,7 +13,6 @@
             </nav>
 
             <div class="flex items-center space-x-4">
-                
                 @auth
                     <a href="{{ route('settings') }}" title="Settings">
                         <i data-lucide="settings" class="w-6 h-6 text-dark hover:text-sakura"></i>
@@ -28,14 +27,14 @@
                         </span>
                     </a>
 
-                    <a href="{{ route('dashboard') }}" title="Dashboard">
+                    <a href="{{ route('account.dashboard') }}" title="Dashboard">
                         <i data-lucide="user" class="w-6 h-6 text-dark hover:text-sakura"></i>
                     </a>
                 @else
                     <a href="{{ route('auth.page') }}" class="font-poppins text-dark hover:text-sakura font-medium">
                         Login / Sign Up
                     </a>
-                @endguest
+                @endauth
 
                 <button onclick="document.getElementById('mobile-menu').classList.toggle('hidden');" class="md:hidden text-dark hover:text-sakura">
                     <i data-lucide="menu" class="w-6 h-6"></i>
@@ -54,10 +53,10 @@
             @auth
                 <a href="{{ route('settings') }}" class="block px-3 py-2 hover:text-sakura">Settings</a>
                 <a href="{{ route('cart') }}" class="block px-3 py-2 hover:text-sakura">Cart</a>
-                <a href="{{ route('dashboard') }}" class="block px-3 py-2 hover:text-sakura">Account</a>
+                <a href="{{ route('account.dashboard') }}" class="block px-3 py-2 hover:text-sakura">Account</a>
             @else
                 <a href="{{ route('auth.page') }}" class="block px-3 py-2 hover:text-sakura font-medium">Login / Sign Up</a>
-            @endguest
+            @endauth
         </div>
     </div>
 </header>

@@ -58,15 +58,11 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials + ['status' => 'active'])) {
             $request->session()->regenerate();
-
-            // Save authenticated user in session for your dashboard
-            session(['user' => Auth::user()]);
-
-            // Redirect to your dashboard route
-            return redirect()->route('account.dashboard');
+            
+            return redirect()->route('dashboard');
         }
 
-        // If login fails, show main branch message
+        // If attempt fails
         return redirect()->route('auth.page')
                         ->with('login_error', 'Invalid login credentials or inactive account.');
     }
@@ -75,8 +71,9 @@ class AuthController extends Controller
     {
         Auth::logout();
         $request->session()->invalidate();
+     
         $request->session()->regenerateToken();
-
+     
         return redirect()->route('auth.page');
     }
 

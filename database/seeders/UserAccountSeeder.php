@@ -16,7 +16,7 @@ class UserAccountSeeder extends Seeder
             'email' => 'test@example.com',
             'password' => Hash::make('password123'),
             'status' => 'active',
-            'user_id' => uniqid('user_'),
+            //'user_id' => uniqid('user_'),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

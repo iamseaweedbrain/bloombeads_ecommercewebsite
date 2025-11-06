@@ -12,11 +12,16 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\ForgotPasswordOtpController;
+
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
 Route::post('/auth/signup', [AuthController::class, 'signUp'])->name('auth.signup');
 Route::post('/auth/login', [AuthController::class, 'login'])->name('auth.login');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); // Using AuthController logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/forgot-password-otp', [ForgotPasswordOtpController::class, 'requestOtp'])->name('requestOtp');
+Route::post('/verify-otp', [ForgotPasswordOtpController::class, 'verifyOtp'])->name('verifyOtp');
+Route::post('/reset-password-with-otp', [ForgotPasswordOtpController::class, 'resetPassword'])->name('resetPassword');
 
 Route::get('/admin/login', [AdminAuthController::class, 'showLoginForm'])->name('admin.login.form');
 Route::post('/admin/login', [AdminAuthController::class, 'login'])->name('admin.login.submit');

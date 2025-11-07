@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Product; // <-- Import the Product model
+use App\Models\Product;
 
 class ProductController extends Controller
 {
@@ -17,5 +17,9 @@ class ProductController extends Controller
 
         // Send the $products to the 'browsecatalog' view
         return view('browsecatalog', ['products' => $products]);
+    }
+    public function show($id)
+    {
+        $product = Product::findOrFail($id);
     }
 }

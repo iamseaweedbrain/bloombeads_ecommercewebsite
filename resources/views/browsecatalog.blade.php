@@ -16,6 +16,7 @@
                 'name' => $product->name,
                 'category' => $product->category,
                 'price' => (float) $product->price,
+                'description' => $product->description,
                 
                 // vvv THIS IS THE NEW LINE vvv
                 'stock' => (int) $product->stock,
@@ -100,6 +101,29 @@
         <div id="filter-modal" class="fixed inset-0 bg-dark bg-opacity-70 z-50 hidden transition-opacity duration-300">
         </div>
 
+        <!-- PRODUCT MODAL -->
+        <div id="product-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
+            <div class="bg-white rounded-2xl shadow-soft max-w-md w-full p-6 relative">
+                <h2 id="modal-product-name" class="text-xl font-fredoka text-dark mb-4"></h2>
+                <img id="modal-product-image" src="" alt="Product Image" class="w-full h-48 object-cover rounded-lg mb-4 bg-gray-100">
+                <p class="text-sakura font-bold text-lg mb-2" id="modal-product-price"></p>
+                <p class="text-sm text-dark/70 mb-1">
+                    <span class="font-semibold">Stock #:</span>
+                    <span id="modal-product-stock">10001</span>
+                </p>
+                <p class="text-sm text-dark/70 mb-1">
+                    <span class="font-semibold">Category:</span>
+                    <span id="modal-product-category"></span>
+                </p>
+                <p class="text-sm text-dark mt-3" id="modal-product-description"></p>
+
+                <button onclick="closeProductModal()" class="mt-6 w-full py-2 bg-sakura text-white font-poppins rounded-xl hover:bg-sakura/90">
+                    Close
+                </button>
+            </div>
+        </div>
+        
+
         <script src="{{ asset('js/catalog.js') }}"></script>
         <script>
             const PHP_PRODUCTS_DATA = @json($js_products);
@@ -112,6 +136,38 @@
                 if (typeof initCatalog === 'function') {
                     initCatalog(PHP_PRODUCTS_DATA, {{ $isLoggedIn ? 'true' : 'false' }}, '{{ $authUrl }}');
                 }
+            });
+            function openProductModal(product) {
+                document.getElementById("modal-product-name").textContent = product.name;
+                document.getElementById("modal-product-price").textContent = `₱${product.price}`;
+                document.getElementById("modal-product-image").src = product.image;
+                document.getElementById("modal-product-stock").textContent = product.stock;
+                document.getElementById("modal-product-category").textContent = product.category;
+                document.getElementById("modal-product-description").textContent = product.description;
+
+                document.getElementById("product-modal").classList.remove("hidden");
+            }
+
+            function closeProductModal() {
+                document.getElementById("product-modal").classList.add("hidden");
+            }
+
+            document.addEventListener("click", function(e) {
+                if (e.target.closest(".view-details-btn")) {
+                    const btn = e.target.closest(".view-details-btn");
+
+                    openProductModal({
+                        name: btn.dataset.name,
+                        price: btn.dataset.price,
+                        image: btn.dataset.image,
+                        stock: btn.dataset.stock,
+                        category: btn.dataset.category,
+                        description: btn.dataset.description
+                    });
+                }
+
+                // Click outside modal to close
+                if (e.target.id === "product-modal") closeProductModal();
             });
         </script>
     </main>

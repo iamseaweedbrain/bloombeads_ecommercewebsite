@@ -25,18 +25,24 @@
                 <div class="space-y-4">
                     @foreach($order->items as $item)
                         <div class="flex items-center space-x-4 border-b border-neutral/50 pb-4 last:border-b-0 last:pb-0">
-                            <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}" 
-                                 alt="{{ $item->product->name }}" 
-                                 class="w-16 h-16 card-radius object-cover bg-gray-100">
-                            <div class="flex-grow">
-                                <h4 class="font-poppins font-semibold text-dark">{{ $item->product->name }}</h4>
-                                <p class="text-sm font-poppins text-dark/70">
-                                    {{ $item->quantity }} x ₱{{ number_format($item->price, 2) }}
-                                </p>
-                            </div>
-                            <div class="font-poppins font-bold text-dark">
-                                ₱{{ number_format($item->quantity * $item->price, 2) }}
-                            </div>
+                            @if($item->product)
+                                <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}" 
+                                     alt="{{ $item->product->name }}" 
+                                     class="w-16 h-16 card-radius object-cover bg-gray-100">
+                                <div class="flex-grow">
+                                    <h4 class="font-poppins font-semibold text-dark">{{ $item->product->name }}</h4>
+                                    <p class="text-sm font-poppins text-dark/70">
+                                        {{ $item->quantity }} x ₱{{ number_format($item->price, 2) }}
+                                    </p>
+                                </div>
+                                <div class="font-poppins font-bold text-dark">
+                                    ₱{{ number_format($item->quantity * $item->price, 2) }}
+                                </div>
+                            @else
+                                <div class="text-red-500">
+                                    [Product not found - ID: {{ $item->product_id }}]
+                                </div>
+                            @endif
                         </div>
                     @endforeach
                 </div>
@@ -113,7 +119,16 @@
                         <strong>Email:</strong>
                         <span>{{ $order->user ? $order->user->email : 'N/A' }}</span>
                     </p>
-                    </div>
+                    
+                    <p>
+                        <strong>Phone:</strong>
+                        <span>{{ $order->user ? ($order->user->contact_number ?? 'Not set') : 'N/A' }}</span>
+                    </p>
+                    <p class="pt-2 border-t border-neutral">
+                        <strong>Shipping Address:</strong>
+                        <span class="block mt-1 text-dark/70">{{ $order->user ? ($order->user->address ?? 'Not set') : 'N/A' }}</span>
+                    </p>
+                </div>
             </div>
         </div>
         

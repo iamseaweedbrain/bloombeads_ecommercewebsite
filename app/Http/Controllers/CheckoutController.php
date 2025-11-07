@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\CartItem;
+use App\Models\UserActivity;
 
 class CheckoutController extends Controller
 {
@@ -32,9 +33,6 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Handle the checkout form submission and create the order.
-     */
     public function process(Request $request)
     {
         $validated = $request->validate([
@@ -52,7 +50,7 @@ class CheckoutController extends Controller
 
         $items = CartItem::where('cart_id', $cart->id)
                            ->whereIn('id', $itemIdsToCheckout)
-                           ->with('product') // Eager load product info
+                           ->with('product')
                            ->get();
 
         if ($items->count() != count($itemIdsToCheckout)) {
@@ -73,6 +71,12 @@ class CheckoutController extends Controller
                 'order_status' => 'pending',
             ]);
 
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'message' => 'Placed Order #' . $order->order_tracking_id,
+                'url' => route('order.show', $order->order_tracking_id)
+            ]);
+
             foreach ($items as $item) {
                 if (!$item->product) {
                     throw new \Exception("Product with ID {$item->product_id} not found.");
@@ -85,7 +89,6 @@ class CheckoutController extends Controller
                     'price' => $item->product->price,
                 ]);
                 
-                // Find the product and decrease its stock
                 $item->product->decrement('stock', $item->quantity);
                 $item->delete(); 
             }
@@ -107,9 +110,6 @@ class CheckoutController extends Controller
         }
     }
 
-    /**
-     * Show the order success/thank you page.
-     */
     public function success()
     {
         if (!session('success') || !session('order_tracking_id')) {

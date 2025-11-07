@@ -3,55 +3,57 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Validation\Rule;
+use App\Models\UserActivity; // <-- Import the activity model
 
 class SettingsController extends Controller
 {
-    public function index()
+    /**
+     * Show the user's profile settings page.
+     */
+    public function show()
     {
-        $user = Session::get('user');
-        if (!$user) {
-            return redirect()->route('auth.page');
-        }
-
-        return view('account_settings.settings', compact('user'));
+        return view('settings', [
+            'user' => Auth::user()
+        ]);
     }
 
+    /**
+     * Update the user's profile information.
+     */
     public function updateProfile(Request $request)
     {
-        $user = Session::get('user');
-        if (!$user) {
-            return redirect()->route('auth.page');
-        }
+        $user = Auth::user();
 
         $validated = $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'fullName' => 'required|string|max:100',
+            'email' => [
+                'required', 'email', 'max:100',
+                Rule::unique('useraccount')->ignore($user->user_id, 'user_id')
+            ],
+            'contact_number' => 'nullable|string|max:20',
+            'address' => 'nullable|string'
         ]);
 
-        DB::table('useraccount')
-            ->where('user_id', $user->user_id)
-            ->update([
-                'fullName' => $validated['fullName'],
-                'email' => $validated['email'],
-                'updated_at' => now(),
-            ]);
+        $user->update($validated);
 
-        // Refresh session user
-        $updatedUser = DB::table('useraccount')->where('user_id', $user->user_id)->first();
-        Session::put('user', $updatedUser);
+        UserActivity::create([
+            'user_id' => $user->user_id,
+            'message' => 'Updated profile information.',
+            'url' => route('settings')
+        ]);
 
-        return redirect()->route('settings.page')->with('success', 'Profile updated successfully!');
+        return redirect()->route('settings')->with('success', 'Profile updated successfully!');
     }
 
+    /**
+     * Update the user's password.
+     */
     public function updatePassword(Request $request)
     {
-        $user = Session::get('user');
-        if (!$user) {
-            return redirect()->route('auth.page');
-        }
+        $user = Auth::user();
 
         $validated = $request->validate([
             'current_password' => 'required',
@@ -59,16 +61,21 @@ class SettingsController extends Controller
         ]);
 
         if (!Hash::check($validated['current_password'], $user->password)) {
-            return back()->with('error', 'Current password is incorrect.');
+            return back()->withErrors([
+                'current_password' => 'Your current password does not match our records.'
+            ]);
         }
 
-        DB::table('useraccount')
-            ->where('user_id', $user->user_id)
-            ->update([
-                'password' => Hash::make($validated['new_password']),
-                'updated_at' => now(),
-            ]);
+        $user->update([
+            'password' => Hash::make($validated['new_password'])
+        ]);
 
-        return redirect()->route('settings.page')->with('success', 'Password updated successfully!');
+        UserActivity::create([
+            'user_id' => $user->user_id,
+            'message' => 'Updated password.',
+            'url' => route('settings')
+        ]);
+
+        return redirect()->route('settings')->with('success', 'Password updated successfully!');
     }
 }

@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
+use App\Models\Cart;
+use App\Models\Order;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -17,8 +17,9 @@ class User extends Authenticatable
     protected $primaryKey = 'user_id';
 
     public $incrementing = true;
-    protected $keyType = 'int'; // set 'string' if non-int
+    protected $keyType = 'int';
     public $timestamps = true;
+    
     protected $fillable = [
         'fullName',
         'email',
@@ -38,8 +39,21 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Get the cart associated with the user.
+     */
     public function cart()
     {
-        return $this->hasOne(Cart::class, 'user_id');
+        return $this->hasOne(Cart::class, 'user_id', 'user_id');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'user_id', 'user_id');
+    }
+    public function activities()
+    {
+        return $this->hasMany(UserActivity::class, 'user_id', 'user_id');
     }
 }

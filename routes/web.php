@@ -7,13 +7,15 @@ use Illuminate\Support\Facades\Auth;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\CartController;
+use App\Http\Controllers\CartController; 
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\SupportMessageController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\SettingsController;
 use App\Models\SupportMessage;
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
@@ -35,17 +37,14 @@ Route::view('/customize', 'customize')->name('customize');
 Route::view('/support', 'support')->name('support');
 Route::post('/contact/submit', [SupportMessageController::class, 'store'])->name('contact.store');
 
-Route::post('/profile/update', [AuthController::class, 'updateProfile'])->name('profile.update');
-Route::post('/profile/password', [AuthController::class, 'updatePassword'])->name('password.update');
-
 Route::middleware('auth')->group(function () {
 
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
-
-    Route::view('/settings', 'settings')->name('settings');
-
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    Route::get('/settings', [SettingsController::class, 'show'])->name('settings');
+    Route::post('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/password/update', [SettingsController::class, 'updatePassword'])->name('password.update');
+    
     // Cart Routes
     Route::get('/cart', [CartController::class, 'index'])->name('cart');
     Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
@@ -64,11 +63,13 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/order/success', [CheckoutController::class, 'success'])
          ->name('checkout.success');
+         
+    Route::get('/order/{order:order_tracking_id}', [DashboardController::class, 'show'])
+         ->name('order.show');
 });
 
 
 // --- ADMIN ROUTES ---
-// Using 'session.user' middleware as defined in your stashed file
 Route::middleware('session.user')->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/dashboard', function() {
@@ -92,5 +93,5 @@ Route::middleware('session.user')->prefix('admin')->name('admin.')->group(functi
     })->name('approvals');
     
     Route::get('/notifications', [SupportMessageController::class, 'notifications'])
-        ->name('notifications');
+         ->name('notifications');
 });

@@ -32,7 +32,11 @@ class ForgotPasswordOtpController extends Controller
         $user = User::where('email', $validated['email'])->first();
         
         // SECURITY FIX: Always return 200 success, regardless of user existence, to prevent email enumeration.
-        if ($user) {
+       if (!$user) {
+        return response()->json([
+            'message' => 'No account found with that email.'
+        ], 404);
+        } else {
             $otp = random_int(100000, 999999);
             $otpHash = Hash::make($otp);
             $expiresAt = Carbon::now()->addMinutes($this->otpTtlMinutes);

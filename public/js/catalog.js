@@ -189,7 +189,13 @@ function renderProductGrid(products) {
         return `
             <div class="product-card bg-white card-radius shadow-soft overflow-hidden transition-shadow duration-300 group hover:shadow-lg flex flex-col"
                  data-category="${product.productCategoryTag}" data-price="${product.price}">
-                <a href="#" class="block aspect-square bg-gray-100 items-center justify-center overflow-hidden group/image" aria-label="View details for ${product.name}">
+                <a href="#" class="block aspect-square bg-gray-100 items-center justify-center overflow-hidden group/image view-details-btn" aria-label="View details for ${product.name}"
+                    data-name="${product.name}"
+                    data-price="${product.price}"
+                    data-image="${product.imagePath}"
+                    data-stock="${product.stock}"
+                    data-category="${product.category}"
+                    data-description="${product.description}">
                     <img src="${product.imagePath}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-300 group-hover/image:scale-105" loading="lazy">
                 </a>
                 <div class="p-3 flex flex-col grow">
@@ -197,7 +203,15 @@ function renderProductGrid(products) {
                     <p class="font-poppins text-xs text-dark/70 mb-1 capitalize">${product.category}</p>
                     <p class="font-poppins font-bold text-lg sm:text-xl text-sakura my-1">₱${product.price.toFixed(2)}</p>
                     <div class="mt-auto pt-2 flex justify-between items-center">
-                         <a href="#" class="text-xs sm:text-sm text-dark hover:text-sky transition-default font-poppins">View Details</a>
+                        <a href="#" class="view-details-btn hover:text-sky font-poppins text-sm sm:text-base transition-default"
+                            data-name="${product.name}"
+                            data-price="${product.price}"
+                            data-image="${product.imagePath}"
+                            data-stock="${product.stock}"
+                            data-category="${product.category}"
+                            data-description="${product.description}">
+                            View Details
+                        </a>
                          ${actionButtonHtml}  </div>
                 </div>
             </div>

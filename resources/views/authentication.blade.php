@@ -10,16 +10,19 @@
             </div>
 
             <div id="auth-status-message" class="h-6 font-poppins text-sm mb-4 text-center">
-                @if(session('login_error'))
-                    {{ session('login_error') }}
+                @if(session('success'))
+                    {{ session('success') }}
+                @endif
+                @if(session('error'))
+                    {{ session('error') }}
                 @endif
             </div>
 
             <div id="signin-form-container" class="space-y-4">
                 <form id="signin-form" method="POST" action="{{ route('auth.login') }}" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2">
-                    <input type="password" name="password" placeholder="Password" required class="w-full border border-neutral rounded-lg p-2">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="password" name="password" placeholder="Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         LOG IN
                     </button>
@@ -30,7 +33,7 @@
                 </button>
 
                 <div class="my-6 border-t border-neutral pt-4">
-                    <button type="button" onclick="setActiveView('signup')" class="text-sm font-poppins text-sakura hover:text-dark transition-default">
+                    <button type="button" onclick="setActiveView('signup')" class="text-sm font-poppins text-sky hover:text-dark transition-default">
                         Don't have an account? <strong class="underline">Sign Up Here</strong>
                     </button>
                 </div>
@@ -39,10 +42,12 @@
             <div id="signup-form-container" class="space-y-4 hidden">
                 <form id="signup-form" method="POST" action="{{ route('auth.signup') }}" class="space-y-4">
                     @csrf
-                    <input type="text" name="fullName" placeholder="Full Name" required class="w-full border border-neutral rounded-lg p-2">
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2">
-                    <input type="password" name="password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2">
-                    <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-sakura hover:bg-opacity-90 transition-default shadow-soft">
+                    <input type="text" name="fullName" placeholder="Full Name" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="password" name="password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="number" name="contact_number" placeholder="Phone Number" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="text" name="address" placeholder="Home Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         SIGN UP
                     </button>
                 </form>
@@ -57,7 +62,7 @@
             <div id="forgot-password-container" class="space-y-4 hidden">
                 <form id="forgot-password-form" method="POST" action="{{ route('requestOtp') }}" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" id="forgot-password-email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2">
+                    <input type="email" name="email" id="forgot-password-email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white btn-password-change bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         SEND RESET CODE
                     </button>
@@ -73,7 +78,7 @@
             <div id="otp-verify-container" class="space-y-4 hidden">
                 <form id="otp-verify-form" method="POST" action="{{ route('verifyOtp') }}" class="space-y-4">
                     @csrf
-                    <input type="hidden" name="email" id="otp-verify-email">
+                    <input type="hidden" name="email" id="otp-verify-email" class="focus:outline-sky">
                     <input type="text" name="otp" placeholder="Enter OTP" required class="w-full border border-neutral rounded-lg p-2">
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         VERIFY CODE
@@ -88,9 +93,9 @@
             <div id="reset-password-container" class="space-y-4 hidden">
                 <form id="reset-password-form" method="POST" action="{{ route('resetPassword') }}" class="space-y-4">
                     @csrf
-                    <input type="hidden" name="reset_token" id="reset-token-input">
-                    <input type="password" name="password" placeholder="New Password (min 8 chars)" required class="w-full border border-neutral rounded-lg p-2">
-                    <input type="password" name="password_confirmation" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2">
+                    <input type="hidden" name="reset_token" id="reset-token-input" class="focus:outline-sky">
+                    <input type="password" name="password" placeholder="New Password (min 8 chars)" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="password" name="password_confirmation" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-sakura hover:bg-opacity-90 transition-default shadow-soft">
                         CHANGE PASSWORD
                     </button>
@@ -100,7 +105,6 @@
     </section>
 
     <script>
-        // Global variable to store the email during the reset flow
         let resetEmail = '';
 
         function setActiveView(view, event = null) {
@@ -136,19 +140,18 @@
                 otpContainer.classList.remove('hidden');
                 titleText = 'Verify Code';
                 messageText = 'Enter the OTP sent to ' + resetEmail + '.';
-                // Populate the hidden email field for OTP verification
                 document.getElementById('otp-verify-email').value = resetEmail;
             } else if (view === 'reset') {
                 resetPassword.classList.remove('hidden');
                 titleText = 'Set New Password';
                 messageText = 'Enter your new password.';
-            } else { // default to signin
+            } else {
                 signIn.classList.remove('hidden');
                 titleText = 'Welcome Back! Sign In';
             }
             
             authTitle.textContent = titleText;
-            authMessage.textContent = messageText; // FIX: Use .textContent for messages
+            authMessage.textContent = messageText;
             status.textContent = ''; 
         }
 
@@ -156,6 +159,7 @@
             const status = document.getElementById('auth-status-message');
             status.className = `h-6 font-poppins text-sm mb-4 text-center ${colorClass}`;
             status.textContent = message;
+            console.error(message);
 
             // Clear status message after 3 seconds
             setTimeout(() => {
@@ -167,25 +171,21 @@
         document.addEventListener('DOMContentLoaded', () => {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
 
-            // --- SIGN UP Handler (Existing) ---
             const signupForm = document.getElementById('signup-form');
             if (signupForm) {
                 signupForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
+                   // e.preventDefault();
                     const formData = new FormData(signupForm);
-                    // ... (rest of your existing signup AJAX logic) ...
-                    // I will skip the boilerplate for brevity, assuming the existing logic is fine.
                 });
             }
 
-            // --- FORGOT PASSWORD (Request OTP) Handler ---
             const forgotPasswordForm = document.getElementById('forgot-password-form');
             if (forgotPasswordForm) {
                 forgotPasswordForm.addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const formData = new FormData(forgotPasswordForm);
                     const emailInput = document.getElementById('forgot-password-email');
-                    resetEmail = emailInput.value; // Store email globally
+                    resetEmail = emailInput.value;
 
                     try {
                         const response = await fetch(forgotPasswordForm.action, {
@@ -203,11 +203,14 @@
 
                         if (response.ok) {
                             showMessage(data.message || 'OTP sent! Please check your email.', 'text-cta');
-                            setActiveView('otp'); // Move to OTP verification step
+                            setActiveView('otp');
                         } else {
                             const message = data.message || (response.status === 422 ? 'Invalid email format.' : 'Failed to send OTP. Check console.');
                             showMessage(message, 'text-sakura');
-                            if (!isJson) console.error('OTP request failed', response.status, await response.text());
+                            if (!isJson) {
+                                showMessage('Server error — try again. Check console for details.', 'text-sakura');
+                                console.error('OTP request failed', response.status, await response.text());
+                            }
                         }
                     } catch (err) {
                         console.error('OTP request error:', err);
@@ -216,7 +219,6 @@
                 });
             }
 
-            // --- OTP VERIFY Handler ---
             const otpVerifyForm = document.getElementById('otp-verify-form');
             if (otpVerifyForm) {
                 otpVerifyForm.addEventListener('submit', async (e) => {
@@ -239,7 +241,6 @@
 
                         if (response.ok && data.reset_token) {
                             showMessage('Code verified! Set your new password.', 'text-cta');
-                            // Store the reset token and move to the password reset step
                             document.getElementById('reset-token-input').value = data.reset_token;
                             setActiveView('reset'); 
                         } else {
@@ -254,7 +255,6 @@
                 });
             }
 
-            // --- RESET PASSWORD Handler ---
             const resetPasswordForm = document.getElementById('reset-password-form');
             if (resetPasswordForm) {
                 resetPasswordForm.addEventListener('submit', async (e) => {
@@ -277,7 +277,7 @@
 
                         if (response.ok) {
                             showMessage(data.message || 'Password successfully changed!', 'text-cta');
-                            setActiveView('signin'); // Go back to sign-in
+                            setActiveView('signin');
                         } else {
                             const message = data.message || (response.status === 422 ? 'Password validation failed.' : 'Reset failed. Check console.');
                             showMessage(message, 'text-sakura');

@@ -44,12 +44,34 @@
         {{ $slot }}
 
         <div id="toast-container" class="fixed bottom-5 right-5 z-[100] space-y-2 pointer-events-none">
-            </div>
+        </div>
 
         <script src="{{ asset('js/toast.js') }}"></script>
 
         <script>
             window.addEventListener('DOMContentLoaded', () => lucide.createIcons());
         </script>
-    </body>
+
+        @if (session('success'))
+            <script>
+                // Wait for the DOM and toast.js to be ready
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (typeof showToast === 'function') {
+                        showToast(@json(session('success')), 'success');
+                    }
+                });
+            </script>
+        @endif
+        
+        @if (session('error'))
+            <script>
+                // Wait for the DOM and toast.js to be ready
+                document.addEventListener('DOMContentLoaded', () => {
+                    if (typeof showToast === 'function') {
+                        showToast(@json(session('error')), 'error');
+                    }
+                });
+            </script>
+        @endif
+        </body>
 </html>

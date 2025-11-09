@@ -99,6 +99,48 @@
 
         {{-- ==== MOBILE FILTER MODAL ==== --}}
         <div id="filter-modal" class="fixed inset-0 bg-dark bg-opacity-70 z-50 hidden transition-opacity duration-300">
+            <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg p-6 transform translate-y-full transition-transform duration-300 ease-in-out">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-fredoka font-bold">Product Filters</h3>
+                    <button onclick="toggleFilterModal()" aria-label="Close filters">
+                        <svg class="w-6 h-6 text-dark/70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <div class="space-y-4 mb-6">
+                    <h4 class="font-poppins font-semibold text-dark">Filter By Category:</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <span onclick="selectCategory('all')" data-category="all" class="mobile-filter-span text-center px-3 py-2 text-sm card-radius font-poppins transition-default cursor-pointer">All</span>
+                        <span onclick="selectCategory('home-supplies')" data-category="home-supplies" class="mobile-filter-span text-center px-3 py-2 text-sm card-radius font-poppins transition-default cursor-pointer">Home</span>
+                        <span onclick="selectCategory('fashion-accessories')" data-category="fashion-accessories" class="mobile-filter-span text-center px-3 py-2 text-sm card-radius font-poppins transition-default cursor-pointer">Fashion</span>
+                        <span onclick="selectCategory('luggage-bags')" data-category="luggage-bags" class="mobile-filter-span text-center px-3 py-2 text-sm card-radius font-poppins transition-default cursor-pointer">Bags</span>
+                        <span onclick="selectCategory('collectibles')" data-category="collectibles" class="mobile-filter-span text-center px-3 py-2 text-sm card-radius font-poppins transition-default cursor-pointer">Collectibles</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 border-t pt-4 border-neutral">
+                    <h4 class="font-poppins font-semibold text-dark">Price Range (₱):</h4>
+                    <div class="flex justify-between font-poppins text-sm">
+                        <span class="text-dark/70">Min: <span id="mobile-min-price-display" class="price-range-display">₱20</span></span>
+                        <span class="text-dark/70">Max: <span id="mobile-max-price-display" class="price-range-display">₱1000</span></span>
+                    </div>
+                    <div class="range-container">
+                        <div class="range-slider-base"></div>
+                        <div id="mobile-range-progress" class="range-progress"></div>
+                        <input id="mobile-min-price-range" type="range" min="20" max="1000" value="20" step="10" oninput="updatePriceRange('mobile-')" class="range-input" style="z-index: 2;">
+                        <input id="mobile-max-price-range" type="range" min="20" max="1000" value="1000" step="10" oninput="updatePriceRange('mobile-')" class="range-input">
+                    </div>
+                </div>
+
+                <div class="mt-6 flex gap-3">
+                    <button onclick="filterProducts(selectedCategory)" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-sky hover:bg-opacity-80 transition-default shadow-soft">
+                        APPLY FILTERS
+                    </button>
+                    <button onclick="toggleFilterModal()" class="w-full py-3 font-fredoka font-bold card-radius text-dark bg-neutral hover:bg-gray-200 transition-default shadow-soft">
+                        CLOSE
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- PRODUCT MODAL -->

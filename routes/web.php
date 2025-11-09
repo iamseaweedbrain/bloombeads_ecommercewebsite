@@ -94,4 +94,7 @@ Route::middleware('session.user')->prefix('admin')->name('admin.')->group(functi
     
     Route::get('/notifications', [SupportMessageController::class, 'notifications'])
          ->name('notifications');
+         
+    Route::get('/notifications/{message}', [SupportMessageController::class, 'show'])
+         ->name('notifications.show');
 });

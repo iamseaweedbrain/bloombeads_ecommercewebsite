@@ -14,6 +14,12 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="bg-red-100 text-red-700 p-4 card-radius mb-6">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
         
         <div class="md:col-span-2 space-y-8">
@@ -49,8 +55,56 @@
             </div>
             
             <div class="bg-white p-6 card-radius shadow-soft">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h2 class="text-xl font-fredoka font-bold mb-4">Order Details</h2>
+                        <div class="space-y-3">
+                            <div class="flex justify-between">
+                                <span class="text-dark/70">Order ID:</span>
+                                <span class="font-semibold text-dark">#{{ $order->order_tracking_id }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-dark/70">Order Date:</span>
+                                <span class="font-semibold text-dark">{{ $order->created_at->format('M d, Y') }}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-dark/70">Payment Method:</span>
+                                <span class="font-semibold text-dark">{{ strtoupper($order->payment_method) }}</span>
+                            </div>
+                            <div class="flex justify-between font-bold text-lg pt-2 border-t border-neutral">
+                                <span class="text-dark">Total:</span>
+                                <span class="text-sakura">₱{{ number_format($order->total_amount, 2) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-fredoka font-bold mb-4">Customer Details</h2>
+                        <div class="space-y-2 text-dark/90">
+                            <p>
+                                <strong>Name:</strong>
+                                <span>{{ $order->user ? $order->user->fullName : 'Guest' }}</span>
+                            </p>
+                            <p>
+                                <strong>Email:</strong>
+                                <span>{{ $order->user ? $order->user->email : 'N/A' }}</span>
+                            </p>
+                            <p>
+                                <strong>Phone:</strong>
+                                <span>{{ $order->user ? ($order->user->contact_number ?? 'Not set') : 'N/A' }}</span>
+                            </p>
+                            <p class="pt-2 border-t border-neutral">
+                                <strong>Shipping Address:</strong>
+                                <span class="block mt-1 text-dark/70">{{ $order->user ? ($order->user->address ?? 'Not set') : 'N/A' }}</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 card-radius shadow-soft">
                 <h2 class="text-xl font-fredoka font-bold mb-4">Update Status</h2>
-                <form action="{{ route('admin.transactions.update', $order) }}" method="POST">
+                
+                <form action="{{ route('admin.transactions.update', $order) }}" method="POST" data-payment-method="{{ $order->payment_method }}">
                     @csrf
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
@@ -69,7 +123,7 @@
                                 <option value="pending" @selected($order->order_status == 'pending')>Pending</option>
                                 <option value="processing" @selected($order->order_status == 'processing')>Processing (In Progress)</option>
                                 <option value="shipped" @selected($order->order_status == 'shipped')>Shipped</option>
-                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</option>
+                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</Loption>
                                 <option value="cancelled" @selected($order->order_status == 'cancelled')>Cancelled</option>
                             </select>
                         </div>
@@ -85,53 +139,84 @@
             
         </div>
         
-        <div class="md:col-span-1 h-fit md:sticky md:top-24">
-            <div class="bg-white p-6 card-radius shadow-soft">
-                <h2 class="text-xl font-fredoka font-bold mb-4">Order Details</h2>
-                <div class="space-y-3">
-                    <div class="flex justify-between">
-                        <span class="text-dark/70">Order ID:</span>
-                        <span class="font-semibold text-dark">#{{ $order->order_tracking_id }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-dark/70">Order Date:</span>
-                        <span class="font-semibold text-dark">{{ $order->created_at->format('M d, Y') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-dark/70">Payment Method:</span>
-                        <span class="font-semibold text-dark">{{ strtoupper($order->payment_method) }}</span>
-                    </div>
-                    <div class="flex justify-between font-bold text-lg pt-2 border-t border-neutral">
-                        <span class="text-dark">Total:</span>
-                        <span class="text-sakura">₱{{ number_format($order->total_amount, 2) }}</span>
-                    </div>
+        <div class="md:col-span-1">
+            
+            <div class="bg-white p-6 card-radius shadow-soft h-fit md:sticky md:top-24">
+                <h2 class="text-xl font-fredoka font-bold mb-4">Payment Receipt</h2>
+                
+                @if($order->payment_receipt_path)
+                    <a href="{{ asset('storage/' . $order->payment_receipt_path) }}" target="_blank" title="Click to view full image"
+                       class="block w-full">
+                        <img src="{{ asset('storage/' . $order->payment_receipt_path) }}" alt="Payment Receipt" 
+                             class="w-full max-h-96 object-cover card-radius border border-neutral hover:border-sky transition-all">
+                    </a>
+                @elseif($order->payment_method == 'cod')
+                    <p class="font-poppins text-dark/70">
+                        This is a Cash on Delivery (COD) order.
+                    </p>
+                @else
+                    <p class="font-poppins text-dark/70">
+                        No payment receipt was uploaded by the customer.
+                    </p>
+                @endif
                 </div>
 
-                <hr class="my-6 border-neutral/60">
-
-                <h2 class="text-xl font-fredoka font-bold mb-4">Customer Details</h2>
-                <div class="space-y-2 text-dark/90">
-                    <p>
-                        <strong>Name:</strong>
-                        <span>{{ $order->user ? $order->user->fullName : 'Guest' }}</span>
-                    </p>
-                    <p>
-                        <strong>Email:</strong>
-                        <span>{{ $order->user ? $order->user->email : 'N/A' }}</span>
-                    </p>
-                    
-                    <p>
-                        <strong>Phone:</strong>
-                        <span>{{ $order->user ? ($order->user->contact_number ?? 'Not set') : 'N/A' }}</span>
-                    </p>
-                    <p class="pt-2 border-t border-neutral">
-                        <strong>Shipping Address:</strong>
-                        <span class="block mt-1 text-dark/70">{{ $order->user ? ($order->user->address ?? 'Not set') : 'N/A' }}</span>
-                    </p>
-                </div>
-            </div>
         </div>
         
     </div>
 </section>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentStatusEl = document.getElementById('payment_status');
+        const orderStatusEl = document.getElementById('order_status');
+        const form = paymentStatusEl.closest('form');
+        const paymentMethod = form.dataset.paymentMethod;
+        
+        if (!paymentStatusEl || !orderStatusEl || !form) return;
+
+        const processingStatuses = ['processing', 'shipped', 'delivered'];
+        const orderOptions = orderStatusEl.querySelectorAll('option');
+
+        function syncOrderOptions() {
+            let currentPayment = paymentStatusEl.value;
+            let currentOrder = orderStatusEl.value;
+
+            orderOptions.forEach(option => {
+                option.disabled = false;
+                option.style.color = '#000';
+            });
+
+            if (currentPayment === 'failed') {
+                // If payment failed, only "Cancelled" is allowed
+                orderOptions.forEach(option => {
+                    if (option.value !== 'cancelled') {
+                        option.disabled = true;
+                        option.style.color = '#999';
+                    }
+                });
+                orderStatusEl.value = 'cancelled';
+                
+            } else if (paymentMethod === 'gcash' || paymentMethod === 'maya') {
+                // GCash/Maya, you must be "Paid" to process
+                if (currentPayment !== 'paid') {
+                    orderOptions.forEach(option => {
+                        if (processingStatuses.includes(option.value)) {
+                            option.disabled = true;
+                            option.style.color = '#999';
+                        }
+                    });
+                    if (processingStatuses.includes(currentOrder)) {
+                        orderStatusEl.value = 'pending';
+                    }
+                }
+            }
+        }
+        paymentStatusEl.addEventListener('change', syncOrderOptions);
+        orderStatusEl.addEventListener('change', syncOrderOptions);
+        syncOrderOptions();
+    });
+</script>
+@endpush
 @endsection

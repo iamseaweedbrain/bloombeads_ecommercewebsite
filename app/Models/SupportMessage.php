@@ -8,5 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class SupportMessage extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'email', 'subject', 'message'];
+    
+    /**
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name', 
+        'email', 
+        'subject', 
+        'message', 
+        'read_at'
+    ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
 }

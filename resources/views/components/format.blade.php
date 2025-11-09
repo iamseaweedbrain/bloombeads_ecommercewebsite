@@ -54,7 +54,6 @@
 
         @if (session('success'))
             <script>
-                // Wait for the DOM and toast.js to be ready
                 document.addEventListener('DOMContentLoaded', () => {
                     if (typeof showToast === 'function') {
                         showToast(@json(session('success')), 'success');
@@ -65,7 +64,6 @@
         
         @if (session('error'))
             <script>
-                // Wait for the DOM and toast.js to be ready
                 document.addEventListener('DOMContentLoaded', () => {
                     if (typeof showToast === 'function') {
                         showToast(@json(session('error')), 'error');

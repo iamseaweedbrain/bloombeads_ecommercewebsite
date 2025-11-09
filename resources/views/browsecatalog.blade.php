@@ -17,11 +17,7 @@
                 'category' => $product->category,
                 'price' => (float) $product->price,
                 'description' => $product->description,
-                
-                // vvv THIS IS THE NEW LINE vvv
                 'stock' => (int) $product->stock,
-                // ^^^ END OF NEW LINE ^^^
-
                 'productCategoryTag' => $categories_map[$product->category] ?? 'all'
             ];
         }
@@ -208,7 +204,6 @@
                     });
                 }
 
-                // Click outside modal to close
                 if (e.target.id === "product-modal") closeProductModal();
             });
         </script>

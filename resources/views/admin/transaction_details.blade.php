@@ -123,7 +123,7 @@
                                 <option value="pending" @selected($order->order_status == 'pending')>Pending</option>
                                 <option value="processing" @selected($order->order_status == 'processing')>Processing (In Progress)</option>
                                 <option value="shipped" @selected($order->order_status == 'shipped')>Shipped</option>
-                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</option>
+                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</Loption>
                                 <option value="cancelled" @selected($order->order_status == 'cancelled')>Cancelled</option>
                             </select>
                         </div>
@@ -138,6 +138,7 @@
             </div>
             
         </div>
+        
         <div class="md:col-span-1">
             
             <div class="bg-white p-6 card-radius shadow-soft h-fit md:sticky md:top-24">
@@ -149,7 +150,11 @@
                         <img src="{{ asset('storage/' . $order->payment_receipt_path) }}" alt="Payment Receipt" 
                              class="w-full max-h-96 object-cover card-radius border border-neutral hover:border-sky transition-all">
                     </a>
-                @elseif($order->payment_method != 'cod')
+                @elseif($order->payment_method == 'cod')
+                    <p class="font-poppins text-dark/70">
+                        This is a Cash on Delivery (COD) order.
+                    </p>
+                @else
                     <p class="font-poppins text-dark/70">
                         No payment receipt was uploaded by the customer.
                     </p>
@@ -157,7 +162,8 @@
                 </div>
 
         </div>
-        </div>
+        
+    </div>
 </section>
 
 @push('scripts')
@@ -166,7 +172,7 @@
         const paymentStatusEl = document.getElementById('payment_status');
         const orderStatusEl = document.getElementById('order_status');
         const form = paymentStatusEl.closest('form');
-        const paymentMethod = form.dataset.paymentMethod; // 'cod', 'gcash', 'maya'
+        const paymentMethod = form.dataset.paymentMethod;
         
         if (!paymentStatusEl || !orderStatusEl || !form) return;
 
@@ -177,15 +183,13 @@
             let currentPayment = paymentStatusEl.value;
             let currentOrder = orderStatusEl.value;
 
-            // First, enable all options
             orderOptions.forEach(option => {
                 option.disabled = false;
                 option.style.color = '#000';
             });
 
-            // Now, apply rules
             if (currentPayment === 'failed') {
-                // RULE 1: If payment failed, only "Cancelled" is allowed
+                // If payment failed, only "Cancelled" is allowed
                 orderOptions.forEach(option => {
                     if (option.value !== 'cancelled') {
                         option.disabled = true;
@@ -195,9 +199,8 @@
                 orderStatusEl.value = 'cancelled';
                 
             } else if (paymentMethod === 'gcash' || paymentMethod === 'maya') {
-                // RULE 2: For GCash/Maya, you must be "Paid" to process
+                // GCash/Maya, you must be "Paid" to process
                 if (currentPayment !== 'paid') {
-                    // This means payment is "pending"
                     orderOptions.forEach(option => {
                         if (processingStatuses.includes(option.value)) {
                             option.disabled = true;

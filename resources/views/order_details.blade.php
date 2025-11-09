@@ -46,7 +46,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
                     
-                    <div class="space-y-8">
+                    @if($order->payment_method == 'cod')
                         <div>
                             <h3 class="text-xl font-fredoka font-bold mb-3">Shipping Information</h3>
                             <div class="font-poppins text-dark/90 space-y-1">
@@ -60,7 +60,7 @@
                             <h3 class="text-xl font-fredoka font-bold mb-3">Order Summary</h3>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Subtotal:</span>
-                                <span>₱{{ number_format($order->total_amount - 10, 2) }}</span> {{-- Assuming 10 is shipping --}}
+                                <span>₱{{ number_format($order->total_amount - 10, 2) }}</span>
                             </div>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Shipping:</span>
@@ -75,21 +75,52 @@
                                 <span class="font-semibold">{{ strtoupper($order->payment_method) }}</span>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div>
-                        <h3 class="text-xl font-fredoka font-bold mb-3">Payment Receipt</h3>
-                        @if($order->payment_receipt_path)
-                            <a href="{{ asset('storage/' . $order->payment_receipt_path) }}" target="_blank" title="View full receipt">
-                                <img src="{{ asset('storage/' . $order->payment_receipt_path) }}" alt="Payment Receipt" 
-                                     class="w-full card-radius border border-neutral hover:border-sky transition-all object-cover max-h-96">
-                            </a>
-                        @elseif($order->payment_method != 'cod')
-                            <p class="font-poppins text-sm text-dark/70">
-                                No receipt was uploaded.
-                            </p>
-                        @endif
+
+                    @else
+                        <div class="space-y-8">
+                            <div>
+                                <h3 class="text-xl font-fredoka font-bold mb-3">Shipping Information</h3>
+                                <div class="font-poppins text-dark/90 space-y-1">
+                                    <p class="font-semibold">{{ $order->user->fullName }}</p>
+                                    <p>{{ $order->user->contact_number ?? 'No contact number' }}</p>
+                                    <p class="text-dark/70">{{ $order->user->address ?? 'No shipping address set' }}</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <h3 class="text-xl font-fredoka font-bold mb-3">Order Summary</h3>
+                                <div class="flex justify-between font-poppins">
+                                    <span class="text-dark/70">Subtotal:</span>
+                                    <span>₱{{ number_format($order->total_amount - 10, 2) }}</span>
+                                </div>
+                                <div class="flex justify-between font-poppins">
+                                    <span class="text-dark/70">Shipping:</span>
+                                    <span>₱10.00</span>
+                                </div>
+                                <div class="flex justify-between font-fredoka font-bold text-lg pt-2 border-t border-neutral">
+                                    <span class="text-dark">Total:</span>
+                                    <span class="text-sakura">₱{{ number_format($order->total_amount, 2) }}</span>
+                                </div>
+                                <div class="flex justify-between font-poppins text-sm">
+                                    <span class="text-dark/70">Payment Method:</span>
+                                    <span class="font-semibold">{{ strtoupper($order->payment_method) }}</span>
+                                </div>
+                            </div>
                         </div>
+                        
+                        <div>
+                            <h3 class="text-xl font-fredoka font-bold mb-3">Payment Receipt</h3>
+                            @if($order->payment_receipt_path)
+                                <a href="{{ asset('storage/' . $order->payment_receipt_path) }}" target="_blank" title="View full receipt">
+                                    <img src="{{ asset('storage/'. $order->payment_receipt_path) }}" alt="Payment Receipt" 
+                                         class="w-full card-radius border border-neutral hover:border-sky transition-all object-cover max-h-96">
+                                </a>
+                            @else
+                                <p class="font-poppins text-sm text-dark/70">
+                                    No receipt was uploaded.
+                                </p>
+                            @endif
+                        </div>
+                    @endif
 
                 </div>
                 </div>

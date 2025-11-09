@@ -6,13 +6,31 @@ use Illuminate\Http\Request;
 use App\Models\SupportMessage;
 use App\Models\UserActivity;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Product; // <-- 1. IMPORT THE PRODUCT MODEL
+use App\Models\Product;
 
 class SupportMessageController extends Controller
 {
     public function store(Request $request)
     {
-        // ... (your existing store method)
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'subject' => 'required|string|max:255',
+            'message' => 'required|string|max:5000',
+        ]);
+
+        $message = SupportMessage::create($validated);
+
+        // Check if the user is logged in before logging
+        if (Auth::check()) {
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'message' => 'Sent a support message: "' . $validated['subject'] . '"',
+                'url' => route('support.show', $message)
+            ]);
+        }
+
+        return back()->with('success', 'Your message has been sent!');
     }
 
     /**
@@ -35,16 +53,14 @@ class SupportMessageController extends Controller
                          ->paginate(20)
                          ->withQueryString();
 
-        // --- vvv 2. ADD LOW STOCK QUERY vvv ---
-        $lowStockProducts = Product::where('stock', '<=', 5) // Get products with stock 5 or less
-                                   ->orderBy('stock', 'asc') // Show lowest stock first
+        $lowStockProducts = Product::where('stock', '<=', 5)
+                                   ->orderBy('stock', 'asc')
                                    ->get();
-        // --- ^^^ END OF NEW QUERY ^^^ ---
 
         return view('admin.notifications', [
             'messages' => $messages,
             'activeFilter' => $filter,
-            'lowStockProducts' => $lowStockProducts // <-- 3. PASS DATA TO THE VIEW
+            'lowStockProducts' => $lowStockProducts
         ]);
     }
 
@@ -53,6 +69,26 @@ class SupportMessageController extends Controller
      */
     public function show(SupportMessage $message)
     {
-        // ... (your existing show method)
+        if (is_null($message->read_at)) {
+            $message->update(['read_at' => now()]);
+        }
+
+        return view('admin.notification_details', [
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * Show a single support message for the user.
+     */
+    public function showUserMessage(SupportMessage $message)
+    {
+        if (Auth::user()->email !== $message->email) {
+            abort(404);
+        }
+
+        return view('support_message_details', [
+            'message' => $message
+        ]);
     }
 }

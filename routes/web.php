@@ -38,9 +38,10 @@ Route::view('/support', 'support')->name('support');
 Route::post('/contact/submit', [SupportMessageController::class, 'store'])->name('contact.store');
 
 Route::middleware('auth')->group(function () {
+     
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+    Route::get('/support-message/{message}', [SupportMessageController::class, 'showUserMessage'])->name('support.show');
     Route::get('/settings', [SettingsController::class, 'show'])->name('settings');
     Route::post('/profile/update', [SettingsController::class, 'updateProfile'])->name('profile.update');
     Route::post('/password/update', [SettingsController::class, 'updatePassword'])->name('password.update');

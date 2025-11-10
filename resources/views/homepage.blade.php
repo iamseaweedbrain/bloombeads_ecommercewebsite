@@ -68,11 +68,14 @@
                     What Bloombeads Offers
                 </h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                    <div class="bg-white p-6 card-radius shadow-soft">
-                        <h3 class="text-xl font-fredoka font-bold text-sakura mb-2">Beaded Bracelets</h3>
-                        <p class="font-poppins text-dark/80">Fully customizable designs, perfect for daily wear and fandom expression.</p>
-                    </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+                <div class="bg-white p-6 card-radius shadow-soft">
+                <img src="{{ asset('catalog-assets/JJK_Bagcharms/geto1.jpg') }}" 
+                      alt="Anime Keychains" 
+                       class="mx-auto mb-4 rounded-xl w-48 h-48 object-cover shadow-md">
+                    <h3 class="text-xl font-fredoka font-bold text-sakura mb-2">Beaded Bracelets</h3>
+                    <p class="font-poppins text-dark/80">Fully customizable designs, perfect for daily wear and fandom expression.</p>
+                </div>
 
                     <div class="bg-white p-6 card-radius shadow-soft">
                         <h3 class="text-xl font-fredoka font-bold text-sky mb-2">Anime Keychains</h3>
@@ -89,3 +92,40 @@
         </section>
 
 </x-layout>
+
+<footer class="bg-[#CFE7FF] mt-20">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center px-10 py-10 md:px-0">
+            
+            <div class="text-center md:text-left md:mb-0">
+                <h1 class="text-5xl font-fredoka font-bold text-sakura">BloombeadsbyJinx</h1>
+            </div>
+
+            <div class="text-center md:text-right">
+                <h2 class="text-lg font-semibold text-gray-800 mb-2">Visit us on</h2>
+                <ul class="space-y-2 text-gray-700">
+                    <li class="flex items-center justify-center md:justify-end space-x-3">
+                        <a href="https://www.facebook.com/BloomcraftsbyJinx" class="text-gray-800 hover:underline">https://www.facebook.com/BloomcraftsbyJinx</a>
+                        <span class="bg-sakura text-white rounded-full p-2 flex items-center justify-center">
+                            <i class="fa-brands fa-facebook" class="w-4 h-4"></i>
+                        </span>
+                    </li>
+                    <li class="flex items-center justify-center md:justify-end space-x-3">
+                        <a href="https://instagramlink.com" class="text-gray-800 hover:underline">https://instagramlink.com//</a>
+                        <span class="bg-sakura text-white rounded-full p-2 flex items-center justify-center">
+                            <i class="fa-brands fa-instagram" class="w-4 h-4"></i>
+                        </span>
+                    </li>
+                    <li class="flex items-center justify-center md:justify-end space-x-3">
+                        <a href="https://www.tiktok.com/@bloombeadsbyjinx?_t=8cMAWDMNc1a&_r=1&fbclid=IwY2xjawN-lm1leHRuA2FlbQIxMABicmlkETFrVTREMWJOeEtKYTBIQU1zc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHvTwwCGdUzPV9qq1QRUZnF1GKFIgvZy_8heKBLG-6-c_dhIoPqabmSCtU8_m_aem_SqjmzOTrxRTq9-8mKJaDCg" class="text-gray-800 hover:underline">https://www.tiktok.com/@bloombeadsbyjinx?_t=8cMAWDMNc1a&_r=1&fbclid=IwY2xjawN-lm1leHRuA2FlbQIxMABicmlkETFrVTREMWJOeEtKYTBIQU1zc3J0YwZhcHBfaWQQMjIyMDM5MTc4ODIwMDg5MgABHvTwwCGdUzPV9qq1QRUZnF1GKFIgvZy_8heKBLG-6-c_dhIoPqabmSCtU8_m_aem_SqjmzOTrxRTq9-8mKJaDCg</a>
+                        <span class="bg-sakura text-white rounded-full p-2 flex items-center justify-center">
+                            <i class="fa-brands fa-tiktok" class="w-4 h-4"></i>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+        <div class="text-center py-3 border-t border-gray-200 text-sm text-gray-600">
+            ©2025 Bloombeads. All Rights Reserved.
+        </div>

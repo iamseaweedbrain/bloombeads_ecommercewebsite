@@ -70,19 +70,25 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
                 <div class="bg-white p-6 card-radius shadow-soft">
-                <img src="{{ asset('catalog-assets/JJK_Bagcharms/geto1.jpg') }}" 
-                      alt="Anime Keychains" 
+                <img src="{{ asset('homepage-assets/beaded-bracelets.png') }}" 
+                      alt="Beaded Bracelets" 
                        class="mx-auto mb-4 rounded-xl w-48 h-48 object-cover shadow-md">
                     <h3 class="text-xl font-fredoka font-bold text-sakura mb-2">Beaded Bracelets</h3>
                     <p class="font-poppins text-dark/80">Fully customizable designs, perfect for daily wear and fandom expression.</p>
                 </div>
 
                     <div class="bg-white p-6 card-radius shadow-soft">
+                    <img src="{{ asset('homepage-assets/anime-keychains.png') }}" 
+                         alt="Anime Keychains" 
+                         class="mx-auto mb-4 rounded-xl w-48 h-48 object-cover shadow-md">
                         <h3 class="text-xl font-fredoka font-bold text-sky mb-2">Anime Keychains</h3>
                         <p class="font-poppins text-dark/80">Exclusive, pre-designed keychains featuring your favorite anime tags and characters.</p>
                     </div>
 
                     <div class="bg-white p-6 card-radius shadow-soft">
+                    <img src="{{ asset('homepage-assets/jewelry-boxes.jpg') }}"
+                          alt="Jewelry Boxes"
+                          class="mx-auto mb-4 rounded-xl w-48 h-48 object-cover shadow-md">
                         <h3 class="text-xl font-fredoka font-bold text-cta mb-2">Jewelry Boxes</h3>
                         <p class="font-poppins text-dark/80">Stylish, cozy storage for your growing collection of beads and accessories.</p>
                     </div>
@@ -128,4 +134,4 @@
 
         <div class="text-center py-3 border-t border-gray-200 text-sm text-gray-600">
             ©2025 Bloombeads. All Rights Reserved.
-        </div>
+        </div>                                                                                                                                                              eto original code

@@ -6,8 +6,9 @@
             <aside class="md:col-span-1">
                 <div class="bg-white p-4 card-radius shadow-soft sticky top-20">
                     <button id="tab-btn-user-info" onclick="setDashboardTab('user-info')" class="dashboard-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2">User Information</button>
-                    <button id="tab-btn-activity" onclick="setDashboardTab('activity')" class="dashboard-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2">Recent Activity</button>
+                    <button id="tab-btn-designs" onclick="setDashboardTab('designs')" class="dashboard-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2">My Custom Designs</button>
                     <button id="tab-btn-orders" onclick="setDashboardTab('orders')" class="dashboard-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2">Order History</button>
+                    <button id="tab-btn-activity" onclick="setDashboardTab('activity')" class="dashboard-tab-btn w-full text-left py-3 px-4 font-fredoka font-bold card-radius transition-default mb-2">Recent Activity</button>
                     
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
@@ -33,6 +34,52 @@
                     </div>
                 </div>
 
+                <div id="dashboard-designs-content" class="hidden">
+                    <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">My Custom Designs</h3>
+                    <div class="space-y-4 font-poppins">
+                        @forelse ($customDesigns as $design)
+                            <div class="border border-neutral card-radius p-4 flex flex-col sm:flex-row justify-between sm:items-center">
+                                <div>
+                                    <p class="font-semibold text-dark">Design Submitted: <span class="font-normal text-dark/80">{{ $design->created_at->format('M d, Y') }}</span></p>
+                                    
+                                    @if($design->status == 'pending')
+                                        <p class="font-fredoka font-bold text-sm uppercase text-cta">PENDING QUOTE</p>
+                                        <p class="text-sm text-dark/70 mt-1">We're reviewing your design and will email you a quote shortly.</p>
+                                    
+                                    @elseif($design->status == 'quoted')
+                                        <p class="font-fredoka font-bold text-sm uppercase text-sky">QUOTE READY</p>
+                                        <p class="text-sm text-dark/70 mt-1">Your quote is ready! You can now proceed to payment.</p>
+                                    
+                                    @elseif($design->status == 'declined')
+                                        <p class="font-fredoka font-bold text-sm uppercase text-red-500">DESIGN DECLINED</p>
+                                        <p class="text-sm text-dark/70 mt-1">Unfortunately, we cannot fulfill this design. Please check your email.</p>
+                                    
+                                    @elseif($design->status == 'complete')
+                                        <p class="font-fredoka font-bold text-sm uppercase text-green-600">ORDER PLACED</p>
+                                        <p class="text-sm text-dark/70 mt-1">This design has been converted into an order.</p>
+                                    @endif
+                                </div>
+                                <div class="mt-3 sm:mt-0 text-right">
+                                    @if($design->status == 'quoted')
+                                        <p class="font-poppins font-bold text-xl text-sakura">₱{{ number_format($design->final_price, 2) }}</p>
+                                        <form action="{{ route('customize.accept', $design) }}" method="POST" class="mt-2">
+                                            @csrf
+                                            <button type="submit" class="inline-block py-2 px-5 font-poppins font-semibold card-radius text-white bg-cta hover:bg-opacity-80 transition-default">
+                                                Accept & Pay
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <div class="text-center py-10 text-dark/70">
+                                <p class="text-lg font-fredoka mb-3">You haven't submitted any designs yet.</p>
+                                <a href="{{ route('customize') }}" class="text-sakura hover:underline font-semibold">Design your own bracelet now!</a>
+                            </div>
+                        @endforelse
+                    </div>
+                </div>
+
                 <div id="dashboard-activity-content" class="hidden">
                     <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">Recent Activity</h3>
                     
@@ -42,14 +89,13 @@
                                 <p class="text-sm text-dark/70">{{ $activity->created_at->diffForHumans() }}</p>
                                 
                                 @if($activity->url)
-                                    <a href="{{ $activity->url }}" class="font-semibold text-sakura hover:text-sky hover:underline transition-default">
+                                    <a href="{{ $activity->url }}" class="font-semibold text-dark hover:text-sakura hover:underline transition-default">
                                         {{ $activity->message }}
                                     </a>
                                 @else
                                     <p class="font-semibold text-dark">{{ $activity->message }}</p>
                                 @endif
-
-                            </div>
+                                </div>
                         @empty
                             <div class="p-3 bg-neutral card-radius border border-gray-200">
                                 <p class="font-semibold text-dark">No recent activity to show.</p>
@@ -151,6 +197,7 @@
             document.getElementById('dashboard-user-info-content').classList.add('hidden');
             document.getElementById('dashboard-activity-content').classList.add('hidden');
             document.getElementById('dashboard-orders-content').classList.add('hidden');
+            document.getElementById('dashboard-designs-content').classList.add('hidden'); 
             
             document.getElementById('dashboard-' + tabId + '-content').classList.remove('hidden');
 

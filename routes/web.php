@@ -16,6 +16,8 @@ use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\SupportMessageController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\CustomizerController;
+use App\Http\Controllers\Admin\CustomDesignController;
 use App\Models\SupportMessage;
 
 Route::get('/auth', [AuthController::class, 'showAuth'])->name('auth.page');
@@ -32,8 +34,8 @@ Route::post('/admin/logout', [AdminAuthController::class, 'logout'])->name('admi
 
 Route::view('/', 'homepage')->name('homepage');
 Route::get('/browsecatalog', [ProductController::class, 'index'])->name('browsecatalog');
-Route::view('/customize', 'customize')->name('customize');
-
+Route::get('/customize', [CustomizerController::class, 'index'])->name('customize');
+Route::post('/customize/submit', [CustomizerController::class, 'submit'])->name('customize.submit');
 Route::view('/support', 'support')->name('support');
 Route::post('/contact/submit', [SupportMessageController::class, 'store'])->name('contact.store');
 
@@ -52,6 +54,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/cart/remove', [CartController::class, 'remove'])->name('cart.remove');
     Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.update.quantity');
 
+    Route::post('/customize/accept-quote/{design}', [CustomizerController::class, 'acceptQuote'])->name('customize.accept');
     // Route from Cart to Payment
     Route::post('/cart/proceed-to-payment', [CartController::class, 'proceedToPayment'])->name('cart.proceed');
 
@@ -89,10 +92,10 @@ Route::middleware('session.user')->prefix('admin')->name('admin.')->group(functi
     Route::get('/transactions/{order}', [AdminOrderController::class, 'show'])->name('transactions.show');
     Route::post('/transactions/{order}/update-status', [AdminOrderController::class, 'updateStatus'])->name('transactions.update');
 
-    Route::get('/approvals', function() {
-        return view('admin.approvals');
-    })->name('approvals');
-    
+     Route::get('/approvals', [CustomDesignController::class, 'index'])->name('approvals');
+     Route::get('/approvals/{design}', [CustomDesignController::class, 'show'])->name('approvals.show');
+    Route::post('/approvals/{design}', [CustomDesignController::class, 'update'])->name('approvals.update');
+
     Route::get('/notifications', [SupportMessageController::class, 'notifications'])
          ->name('notifications');
          

@@ -144,7 +144,7 @@
             <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl h-90 p-6 flex relative">
                 <div class="w-1/2 flex items-center justify-center">
                     <img id="modal-product-image" src="" alt="Product Image"
-                        class="w-56 h-56 object-cover rounded-xl bg-gray-100" />
+                        class="w-72 h-72 object-cover rounded-xl bg-gray-100" />
                 </div>
                 <div class="w-1/2 pl-6 pr-4 flex flex-col justify-between">
                     <div>
@@ -158,13 +158,13 @@
                         <p id="modal-product-category"
                         class="inline-block px-3 py-1 rounded-full bg-sakura/20 text-sakura font-medium text-sm mb-4">
                         </p>
-                        <p class="text-sm text-dark/70 mb-4">
-                        <span class="font-semibold">Stock #:</span>
-                        <span id="modal-product-stock"></span>
-                        </p>
                         <p id="modal-product-description" class="text-sm text-dark/80 leading-relaxed mt-2"></p>
                     </div>
-                    <div class="text-right">
+                    <div class="flex items-center justify-between mt-4">
+                        <p class="text-lg font-bold text-dark/70">
+                            <span class="font-bold">Stock:</span>
+                            <span id="modal-product-stock" ></span>
+                        </p>
                         <p id="modal-product-price" class="text-xl font-bold text-sakura"></p>
                     </div>
                 </div>

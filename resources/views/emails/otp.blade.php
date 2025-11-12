@@ -1,83 +1,124 @@
-<x-format>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Password Reset Code</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Poppins:wght@400;700&display=swap');
+        body { 
+            font-family: 'Poppins', sans-serif; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #fdfdfd;
+        }
+        
+        .container { 
+            width: 90%; 
+            max-width: 600px; 
+            margin: 20px auto; 
+            border: 1px solid #eee; 
+            border-radius: 12px; 
+            overflow: hidden; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08); 
+        }
+        
+        /* Header */
+        .header { 
+            background-color: #FF6B81; 
+            padding: 25px 20px; 
+            text-align: center; 
+        }
+        
+        .header h1 { 
+            color: white; 
+            font-family: 'Fredoka', sans-serif; 
+            margin: 0;
+            font-size: 1.8rem;
+            text-align: center;
+        }
+        
+        /* Content */
+        .content { 
+            padding: 30px 35px; 
+        }
+        
+        .content p { 
+            color: #333; 
+            line-height: 1.6; 
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .content p.intro {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .otp-box {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+            border: 1px dashed #FF6B81;
+        }
+        
+        .otp-box p {
+            margin: 0 0 10px 0;
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .otp-code {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: #FF6B81;
+            letter-spacing: 5px;
+            margin: 0;
+            text-align: center;
+        }
+        
+        .warning {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .footer { 
+            background-color: #F7F7F7; 
+            padding: 25px; 
+            text-align: center; 
+            color: #777; 
+            font-size: 12px;
+            border-top: 1px solid #eee;
+        }
     </style>
-    <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #F7F7F7; font-family: 'Poppins', sans-serif; line-height: 1.5;">
-        <tr>
-            <td align="center" style="padding: 25px 0;">
-                <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; border: 1px solid #e5e7eb; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);">
-                    
-                    <tr>
-                        <td align="center" style="padding: 30px 20px 20px 20px;">
-                            <h1 style="font-family: 'Fredoka', sans-serif; font-size: 32px; color: #333333; margin: 0;">
-                                {{ config('app.name') }}
-                            </h1>
-                        </td>
-                    </tr>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Password Reset Request</h1>
+        </div>
+        <div class="content">
+            <p class="intro">Hi {{ $name ?? 'there' }},</p>
+            
+            <p>We received a request to reset the password for your account. Please use the One-Time Password (OTP) below to proceed.</p>
 
-                    <tr>
-                        <td style="padding: 0 40px 20px 40px; font: ; color: #333333; font-size: 16px;">
-                            <h2 style="font-size: 24px; font-weight: bold; color: #FF6B81; margin: 0 0 15px 0;">
-                                Password Reset Code
-                            </h2>
-                            <p style="margin-bottom: 20px;">
-                                Hello,
-                            </p>
-                            <p style="margin-bottom: 20px;">
-                                We received a request to reset the password for your account. Please use the **One-Time Password (OTP)** below to complete the verification process.
-                            </p>
+            <div class="otp-box">
+                <p>Your OTP Code is:</p>
+                <h2 class="otp-code">{{ $otp }}</h2>
+            </div>
 
-                            <table width="100%" cellpadding="0" cellspacing="0" role="presentation" style="background-color: #F7F7F7; border-radius: 8px; margin-bottom: 25px; border: 1px dashed #FF6B81;">
-                                <tr>
-                                    <td align="center" style="padding: 20px;">
-                                        <div style="font-family: monospace; font-size: 36px; font-weight: bold; letter-spacing: 10px; color: #333333; padding: 5px 0;">
-                                            {{ $otp }}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-
-                            <p style="margin-bottom: 20px; font-weight: 600; color: #FF6B81;">
-                                Important: This code is valid for <strong>{{ $ttl }} minutes</strong> only. Do not share this code with anyone.
-                            </p>
-                            
-                            <!-- Action Button 
-                            <table width="100%" cellspacing="0" cellpadding="0" style="margin-top: 30px; margin-bottom: 30px;">
-                                <tr>
-                                    <td align="center">
-                                        <table cellspacing="0" cellpadding="0">
-                                            <tr>
-                                                <td style="border-radius: 8px; background-color: #FFB347; padding: 12px 25px; text-align: center;">
-                                                    <a href="{{ route ('verifyOtp') }}" target="_blank" style="color: #ffffff; text-decoration: none; font-weight: bold; font-size: 16px; font-family: 'Poppins', sans-serif; display: inline-block;">
-                                                        Continue Password Reset
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            </table>
-                        -->
-                            <p style="margin-bottom: 20px; font-size: 14px; color: #6b7280;">   
-                                Security Alert: If you did not request a password reset, please ignore this email immediately. Your password will remain secure and unchanged.
-                            </p>
-                            <p style="margin-top: 30px;">
-                                Thanks,
-                                <br>
-                                The {{ config('app.name') }} Team
-                            </p>
-                        </td>
-                    </tr>
-
-                    <tr>
-                        <td align="center" style="padding: 20px 40px; border-top: 1px solid #e5e7eb;">
-                            <p style="margin: 0; font-size: 12px; color: #9ca3af;">
-                                &copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</x-format>
+            <p>This code is valid for 10 minutes. For your security, do not share this code with anyone.</p>
+            
+            <p class="warning">If you did not request a password reset, please ignore this email. Your account is still secure.</p>
+        </div>
+        <div class="footer">
+            &copy; {{ date('Y') }} Bloombeads by Jinx. All Rights Reserved.
+        </div>
+    </div>
+</body>
+</html>

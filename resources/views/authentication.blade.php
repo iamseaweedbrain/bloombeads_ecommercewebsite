@@ -21,8 +21,13 @@
             <div id="signin-form-container" class="space-y-4">
                 <form id="signin-form" method="POST" action="{{ route('auth.login') }}" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
-                    <input type="password" name="password" placeholder="Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
+                    <div class="relative">
+                        <input type="password" name="password" id="login-password" placeholder="Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('login-password')">
+                            <i class="far fa-eye" id="toggle-login-password"></i>
+                        </span>
+                    </div>
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         LOG IN
                     </button>
@@ -42,9 +47,14 @@
             <div id="signup-form-container" class="space-y-4 hidden">
                 <form id="signup-form" method="POST" action="{{ route('auth.signup') }}" class="space-y-4">
                     @csrf
-                    <input type="text" name="fullName" placeholder="Full Name" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
-                    <input type="password" name="password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <input type="text" name="fullName" placeholder="Full Name" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
+                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
+                    <div class="relative mb-4">
+                        <input type="password" name="password" id="signup-password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('signup-password')">
+                            <i class="far fa-eye" id="toggle-signup-password"></i>
+                        </span>
+                    </div>
                     <input type="number" name="contact_number" placeholder="Phone Number" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
                     <input type="text" name="address" placeholder="Home Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
@@ -94,8 +104,18 @@
                 <form id="reset-password-form" method="POST" action="{{ route('resetPassword') }}" class="space-y-4">
                     @csrf
                     <input type="hidden" name="reset_token" id="reset-token-input" class="focus:outline-sky">
-                    <input type="password" name="password" placeholder="New Password (min 8 chars)" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
-                    <input type="password" name="password_confirmation" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <div class="relative mb-4">
+                        <input type="password" name="password" id="reset-new-password" placeholder="New Password (min 8 chars)" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('reset-new-password')">
+                            <i class="far fa-eye" id="toggle-reset-new-password"></i>
+                        </span>
+                    </div>
+                    <div class="relative mb-4">
+                        <input type="password" name="password_confirmation" id="reset-confirm-password" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('reset-confirm-password')">
+                            <i class="far fa-eye" id="toggle-reset-confirm-password"></i>
+                        </span>
+                    </div>
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-sakura hover:bg-opacity-90 transition-default shadow-soft">
                         CHANGE PASSWORD
                     </button>
@@ -166,6 +186,21 @@
                 status.textContent = '';
                 status.className = 'h-6 font-poppins text-sm mb-4 text-center';
             }, 3000);
+        }
+
+        function togglePasswordVisibility(fieldId) {
+            const passwordField = document.getElementById(fieldId);
+            const toggleIcon = document.getElementById(`toggle-${fieldId}`);
+
+            if (passwordField.type === 'password') {
+                passwordField.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordField.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

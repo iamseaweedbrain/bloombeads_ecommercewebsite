@@ -6,8 +6,8 @@
     <title>Bloombeads - Admin Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400..700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     
     <script>
@@ -30,6 +30,8 @@
             },
         }
     </script>
+
+    @yield('styles')
 </head>
 
 <body class="min-h-screen bg-neutral"
@@ -39,37 +41,34 @@
       data-session-error="{{ session('error') }}">
 
     <div class="flex h-screen bg-neutral">
-        <!-- Sidebar Navigation -->
         <aside id="admin-sidebar" class="w-64 bg-white p-4 shadow-soft flex flex-col shrink-0 md:flex custom-scrollbar overflow-y-auto">
             <div class="shrink-0">
                 <h1 class="text-2xl font-fredoka font-bold text-sakura text-center mb-6">Bloombeads Admin</h1>
             </div>
 
-            <!-- Navigation Laravel routes -->
             <nav class="grow space-y-2">
                 <a href="{{ route('admin.dashboard') }}" id="nav-dashboard" class="admin-nav-link w-full {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6-4a1 1 0 001-1v-1a1 1 0 10-2 0v1a1 1 0 001 1zm5 0a1 1 0 001-1v-1a1 1 0 10-2 0v1a1 1 0 001 1z"></path></svg>
                     <span>Dashboard</span>
                 </a>
-                <a href="{{ route('admin.catalog.index') }}" id="nav-catalog" class="admin-nav-link w-full {{ request()->routeIs('admin.catalog.index') ? 'active' : '' }}">
+                <a href="{{ route('admin.catalog.index') }}" id="nav-catalog" class="admin-nav-link w-full {{ request()->routeIs('admin.catalog.index*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span>Catalog Management</span>
                 </a>
-                <a href="{{ route('admin.transactions') }}" id="nav-transactions" class="admin-nav-link w-full {{ request()->routeIs('admin.transactions') ? 'active' : '' }}">
+                <a href="{{ route('admin.transactions') }}" id="nav-transactions" class="admin-nav-link w-full {{ request()->routeIs('admin.transactions*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     <span>Transactions</span>
                 </a>
-                <a href="{{ route('admin.approvals') }}" id="nav-approvals" class="admin-nav-link w-full {{ request()->routeIs('admin.approvals') ? 'active' : '' }}">
+                <a href="{{ route('admin.approvals') }}" id="nav-approvals" class="admin-nav-link w-full {{ request()->routeIs('admin.approvals*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span>Approvals</span>
                 </a>
-                <a href="{{ route('admin.notifications') }}" id="nav-notifications" class="admin-nav-link w-full {{ request()->routeIs('admin.notifications') ? 'active' : '' }}">
+                <a href="{{ route('admin.notifications') }}" id="nav-notifications" class="admin-nav-link w-full {{ request()->routeIs('admin.notifications*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
                     <span>Notifications</span>
                 </a>
             </nav>
 
-            <!-- Admin User Info & Logout Link -->
             <div class="shrink-0 mt-6 pt-4 border-t border-neutral">
                 <div class="flex items-center">
                     <img src="https://placehold.co/40x40/FFB347/333333?text=A" alt="Admin User" class="w-10 h-10 rounded-full">
@@ -86,14 +85,11 @@
             </div>
         </aside>
 
-        <!-- Hidden Logout Form -->
         <form id="logout-form" action="{{ route('admin.logout') }}" method="POST" class="hidden">
             @csrf
         </form>
 
-        <!-- Main Content Area -->
         <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Top Header (for mobile toggle) -->
             <header class="bg-white shadow-soft p-4 flex justify-between items-center md:hidden">
                 <h1 class="text-xl font-fredoka font-bold text-sakura">Admin Menu</h1>
                 <button onclick="document.getElementById('admin-sidebar').classList.toggle('hidden')" class="text-dark hover:text-sakura p-2">
@@ -101,7 +97,6 @@
                 </button>
             </header>
 
-            <!-- Main Content (Scrollable) -->
             <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
 
                 @yield('content')
@@ -110,7 +105,6 @@
         </div>
     </div>
 
-    <!-- Add/Edit Product Modal -->
     <div id="productModal" class="modal-overlay">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-4">
@@ -160,6 +154,7 @@
 
     <div id="toast-container" class="fixed bottom-5 right-5 z-100 space-y-2">
     </div>
-</body>
-</html>
 
+    @stack('scripts')
+    </body>
+</html>

@@ -12,6 +12,7 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\SupportMessageController;
 use App\Http\Controllers\DashboardController;
@@ -76,9 +77,7 @@ Route::middleware('auth')->group(function () {
 // --- ADMIN ROUTES ---
 Route::middleware('session.user')->prefix('admin')->name('admin.')->group(function () {
 
-    Route::get('/dashboard', function() {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     // Catalog (Products)
     Route::get('/catalog', [AdminProductController::class, 'index'])->name('catalog.index');

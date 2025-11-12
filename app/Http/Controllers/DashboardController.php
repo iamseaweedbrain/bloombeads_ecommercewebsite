@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
+use App\Models\CustomDesign; // <-- 1. IMPORT CustomDesign
+use App\Models\UserActivity; // <-- 2. IMPORT UserActivity
 
 class DashboardController extends Controller
 {
@@ -13,6 +15,7 @@ class DashboardController extends Controller
         $user = Auth::user();
         $statusFilter = $request->query('status', 'all');
 
+        // --- Get Orders ---
         $orderQuery = $user->orders()
                            ->with('items.product')
                            ->orderBy('created_at', 'desc');
@@ -40,20 +43,29 @@ class DashboardController extends Controller
         $orders = $orderQuery->paginate(5)->withQueryString();
 
 
+        // --- Get Recent Activities ---
         $activities = $user->activities()
                            ->orderBy('created_at', 'desc')
                            ->take(5)
                            ->get();
+                           
+        $customDesigns = $user->customDesigns()
+                              ->orderBy('created_at', 'desc')
+                              ->get();
 
 
         return view('dashboard', [
             'user' => $user,
             'orders' => $orders,
-            'activities' => $activities,
+            'activities' => $activities, 
+            'customDesigns' => $customDesigns,
             'activeStatusFilter' => $statusFilter
         ]);
     }
-    
+
+    /**
+     * Show the details for a single order.
+     */
     public function show(Order $order)
     {
         if ($order->user_id !== Auth::id()) {

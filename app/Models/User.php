@@ -7,6 +7,9 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\UserActivity;
+use App\Models\CustomDesign;
+
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -52,8 +55,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Order::class, 'user_id', 'user_id');
     }
+
     public function activities()
     {
         return $this->hasMany(UserActivity::class, 'user_id', 'user_id');
+    }
+
+    public function customDesigns()
+    {
+        return $this->hasMany(CustomDesign::class, 'user_id', 'user_id');
     }
 }

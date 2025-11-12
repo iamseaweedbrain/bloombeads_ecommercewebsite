@@ -10,7 +10,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\CartItem;
 use App\Models\UserActivity;
-use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rule; // <-- 1. IMPORT THIS
 
 class CheckoutController extends Controller
 {
@@ -34,35 +34,90 @@ class CheckoutController extends Controller
         ]);
     }
 
+    /**
+     * Handle the checkout form submission and create the order.
+     */
     public function process(Request $request)
     {
-        // 1. Validate the form data
+        
+        if ($request->session()->has('checkout_order_id')) {
+            return $this->finalizeCustomOrder($request);
+        } else {
+            return $this->finalizeCartOrder($request);
+        }
+    }
+
+
+    /**
+     * Finalizes an order that came from a CUSTOM DESIGN.
+     */
+    private function finalizeCustomOrder(Request $request)
+    {
         $validated = $request->validate([
-            'total_amount'   => 'required|numeric|min:0',
             'payment_method' => 'required|string|in:cod,gcash,maya',
-            
-            // vvv NEW VALIDATION RULE vvv
-            // The receipt is only required if the method is gcash or maya
             'payment_receipt' => [
                 Rule::requiredIf(fn () => in_array($request->payment_method, ['gcash', 'maya'])),
-                'nullable',
-                'image',
-                'mimes:jpg,jpeg,png',
-                'max:2048', // 2MB max size
+                'nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048',
             ],
         ]);
 
-        // 2. Get data from the session
+        $order = Order::find(session('checkout_order_id'));
+        if (!$order) {
+            return redirect()->route('cart')->with('error', 'Your session expired. Please try again.');
+        }
+
+        DB::beginTransaction();
+        try {
+            $receiptPath = null;
+            if ($request->hasFile('payment_receipt')) {
+                $receiptPath = $request->file('payment_receipt')->store('receipts', 'public');
+            }
+
+            $order->update([
+                'payment_method' => $validated['payment_method'],
+                'payment_status' => ($validated['payment_method'] === 'cod') ? 'unpaid' : 'pending',
+                'payment_receipt_path' => $receiptPath
+            ]);
+
+            DB::commit();
+
+            session()->forget('checkout_total');
+            session()->forget('checkout_order_id');
+
+            return redirect()->route('checkout.success')->with([
+                'success' => 'Your order has been placed!',
+                'order_tracking_id' => $order->order_tracking_id,
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Custom Order Finalize Error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+        }
+    }
+
+
+    private function finalizeCartOrder(Request $request)
+    {
+        //Validate
+        $validated = $request->validate([
+            'total_amount'   => 'required|numeric|min:0',
+            'payment_method' => 'required|string|in:cod,gcash,maya',
+            'payment_receipt' => [
+                Rule::requiredIf(fn () => in_array($request->payment_method, ['gcash', 'maya'])),
+                'nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048',
+            ],
+        ]);
+
+        //Get data from session
         $itemIdsToCheckout = session('checkout_item_ids', []);
         $total = session('checkout_total', 0);
         $cart = Auth::user()->cart;
 
-        // 3. Check for errors
         if (empty($itemIdsToCheckout) || $total <= 0 || !$cart) {
             return redirect()->route('cart')->with('error', 'Your session expired or your cart is empty. Please try again.');
         }
 
-        // 4. Get items from the DATABASE
         $items = CartItem::where('cart_id', $cart->id)
                            ->whereIn('id', $itemIdsToCheckout)
                            ->with('product')
@@ -72,23 +127,17 @@ class CheckoutController extends Controller
              return redirect()->route('cart')->with('error', 'Some items could not be found. Please refresh and try again.');
         }
 
-        // 6. Determine Payment Status
         $paymentStatus = ($validated['payment_method'] === 'cod') ? 'unpaid' : 'pending';
 
-        // 7. Create the Order (Database Transaction)
+        //Database Transaction
         DB::beginTransaction();
 
         try {
-            
-            // --- vvv NEW: Handle File Upload vvv ---
             $receiptPath = null;
             if ($request->hasFile('payment_receipt')) {
-                // Store in 'public/receipts' folder
                 $receiptPath = $request->file('payment_receipt')->store('receipts', 'public');
             }
-            // --- ^^^ END OF FILE LOGIC ^^^ ---
 
-            // Create the main Order
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_tracking_id' => 'BB-' . Str::upper(Str::random(8)),
@@ -96,19 +145,16 @@ class CheckoutController extends Controller
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => $paymentStatus,
                 'order_status' => 'pending',
-                'payment_receipt_path' => $receiptPath, // <-- ADDED THIS LINE
+                'payment_receipt_path' => $receiptPath,
             ]);
 
-            // Create User Activity
             UserActivity::create([
                 'user_id' => Auth::id(),
                 'message' => 'Placed Order #' . $order->order_tracking_id,
                 'url' => route('order.show', $order->order_tracking_id)
             ]);
 
-            // 8. Create the Order Items
             foreach ($items as $item) {
-                // ... (your existing foreach loop code to create OrderItem, decrement stock, and delete from cart)
                 if (!$item->product) {
                     throw new \Exception("Product with ID {$item->product_id} not found.");
                 }
@@ -134,11 +180,14 @@ class CheckoutController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Checkout Error: ' . $e->getMessage());
+            \Log::error('Cart Checkout Error: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Something went wrong while placing your order. Please try again.');
         }
     }
 
+    /**
+     * Show the order success/thank you page.
+     */
     public function success()
     {
         if (!session('success') || !session('order_tracking_id')) {

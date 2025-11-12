@@ -1,6 +1,31 @@
 @extends('layouts.admin')
 
 @section('content')
+<style>
+    .bracelet-preview-container {
+        position: relative;
+        width: 400px;
+        height: 400px;
+        margin: 2rem auto;
+    }
+    .bracelet-slot {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        width: 32px;
+        height: 32px;
+        margin: -16px;
+        border-radius: 50%;
+        background-color: #f0f0f0;
+        border: 2px dashed #d1d5db;
+        background-size: cover;
+        background-position: center;
+    }
+    .bracelet-slot.filled {
+        border: 2px solid var(--color-sakura);
+    }
+</style>
+
 <section id="transaction-details-view" class="font-poppins">
 
     <a href="{{ route('admin.transactions') }}" class="flex items-center text-sky hover:text-opacity-80 font-fredoka font-semibold mb-4">
@@ -54,6 +79,17 @@
                 </div>
             </div>
             
+            @if($order->custom_design_id)
+            <div class="bg-white p-6 card-radius shadow-soft">
+                <h2 class="text-xl font-fredoka font-bold mb-4">Custom Design Details</h2>
+                <p class="font-poppins text-dark/70 mb-4">This order was created from a custom design quote.</p>
+                <a href="{{ route('admin.approvals.show', $order->custom_design_id) }}" 
+                   class="inline-block py-3 px-6 font-fredoka font-bold card-radius text-white bg-sky hover:bg-opacity-80 transition-default shadow-soft">
+                    View Submitted Design
+                </a>
+            </div>
+            @endif
+
             <div class="bg-white p-6 card-radius shadow-soft">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div>
@@ -100,13 +136,16 @@
                     </div>
                 </div>
             </div>
-
+        </div>
+        
+        <div class="md:col-span-1 space-y-8 h-fit md:sticky md:top-24">
+            
             <div class="bg-white p-6 card-radius shadow-soft">
                 <h2 class="text-xl font-fredoka font-bold mb-4">Update Status</h2>
                 
                 <form action="{{ route('admin.transactions.update', $order) }}" method="POST" data-payment-method="{{ $order->payment_method }}">
                     @csrf
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="grid grid-cols-1 gap-6">
                         <div>
                             <label for="payment_status" class="block font-semibold mb-2">Payment Status</label>
                             <select name="payment_status" id="payment_status" class="w-full p-2 card-radius border border-gray-300">
@@ -123,7 +162,7 @@
                                 <option value="pending" @selected($order->order_status == 'pending')>Pending</option>
                                 <option value="processing" @selected($order->order_status == 'processing')>Processing (In Progress)</option>
                                 <option value="shipped" @selected($order->order_status == 'shipped')>Shipped</option>
-                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</Loption>
+                                <option value="delivered" @selected($order->order_status == 'delivered')>Delivered</option>
                                 <option value="cancelled" @selected($order->order_status == 'cancelled')>Cancelled</option>
                             </select>
                         </div>
@@ -137,11 +176,7 @@
                 </form>
             </div>
             
-        </div>
-        
-        <div class="md:col-span-1">
-            
-            <div class="bg-white p-6 card-radius shadow-soft h-fit md:sticky md:top-24">
+            <div class="bg-white p-6 card-radius shadow-soft">
                 <h2 class="text-xl font-fredoka font-bold mb-4">Payment Receipt</h2>
                 
                 @if($order->payment_receipt_path)
@@ -159,8 +194,7 @@
                         No payment receipt was uploaded by the customer.
                     </p>
                 @endif
-                </div>
-
+            </div>
         </div>
         
     </div>
@@ -189,7 +223,6 @@
             });
 
             if (currentPayment === 'failed') {
-                // If payment failed, only "Cancelled" is allowed
                 orderOptions.forEach(option => {
                     if (option.value !== 'cancelled') {
                         option.disabled = true;
@@ -199,7 +232,6 @@
                 orderStatusEl.value = 'cancelled';
                 
             } else if (paymentMethod === 'gcash' || paymentMethod === 'maya') {
-                // GCash/Maya, you must be "Paid" to process
                 if (currentPayment !== 'paid') {
                     orderOptions.forEach(option => {
                         if (processingStatuses.includes(option.value)) {

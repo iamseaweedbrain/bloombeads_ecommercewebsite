@@ -15,6 +15,10 @@
             <script src="https://unpkg.com/lucide@latest"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" crossorigin="anonymous"></script>
 
+            {{-- resibo pre --}}
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 
             {{-- Vite / asset files --}}
             @vite(['resources/css/app.css', 'resources/js/app.js'])

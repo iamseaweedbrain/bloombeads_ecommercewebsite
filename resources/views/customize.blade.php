@@ -65,7 +65,7 @@
                 
                 <!-- Component Selection -->
                 <div class="bg-white p-6 card-radius shadow-soft sticky top-24">
-                    <h2 class="text-2xl font-fredoka font-bold mb-4">Components</h2>
+                    <h2 class="text-2xl font-fredoka font-bold mb-4">Beads</h2>
                             
                     <div id="component-library" class="space-y-6 max-h-96 overflow-y-auto pr-2">
                         @forelse ($categories as $category)
@@ -90,12 +90,12 @@
                                             <p class="text-xs font-poppins mt-1 truncate">{{ $component->name }}</p>
                                         </button>
                                     @empty
-                                        <p class="text-xs text-dark/60 col-span-full">No components in this category yet.</p>
+                                        <p class="text-xs text-dark/60 col-span-full">Nothing can be seen in this category yet.</p>
                                     @endforelse
                                 </div>
                             </div>
                         @empty
-                            <p class="font-poppins text-dark/70">No components have been added to the admin panel yet.</p>
+                            <p class="font-poppins text-dark/70">Sorry, we haven't restocked yet.</p>
                         @endforelse
                     </div>
                 </div>

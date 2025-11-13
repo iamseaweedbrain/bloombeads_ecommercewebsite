@@ -13,13 +13,10 @@ use App\Models\UserActivity;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderPlaced;
-use App\Mail\AdminOrderNotification; // <-- 1. IMPORT THE NEW ADMIN MAILABLE
+use App\Mail\AdminOrderNotification;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Show the payment page
-     */
     public function showPaymentPage()
     {
         $total = session('checkout_total', 0);
@@ -36,10 +33,6 @@ class CheckoutController extends Controller
             'shipping' => $shipping,
         ]);
     }
-
-    /**
-     * Handle the checkout form submission and create the order.
-     */
     public function process(Request $request)
     {
         
@@ -49,11 +42,6 @@ class CheckoutController extends Controller
             return $this->finalizeCartOrder($request);
         }
     }
-
-
-    /**
-     * Finalizes an order that came from a CUSTOM DESIGN.
-     */
     private function finalizeCustomOrder(Request $request)
     {
         $validated = $request->validate([
@@ -84,15 +72,11 @@ class CheckoutController extends Controller
 
             DB::commit();
             
-            // --- vvv 2. THIS IS THE UPDATED EMAIL LOGIC vvv ---
             $order->load('user', 'items.product');
             
-            // Send "OrderPlaced" email to the CUSTOMER
             Mail::to($order->user->email)->send(new OrderPlaced($order));
             
-            // Send "AdminOrderNotification" email to YOU
             Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
-            // --- ^^^ END OF UPDATED LOGIC ^^^ ---
 
             session()->forget('checkout_total');
             session()->forget('checkout_order_id');
@@ -108,14 +92,8 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Something went wrong. Please try again.');
         }
     }
-
-
-    /**
-     * Finalizes an order that came from the SHOPPING CART.
-     */
     private function finalizeCartOrder(Request $request)
     {
-        //Validate
         $validated = $request->validate([
             'total_amount'   => 'required|numeric|min:0',
             'payment_method' => 'required|string|in:cod,gcash,maya',
@@ -125,7 +103,6 @@ class CheckoutController extends Controller
             ],
         ]);
 
-        //Get data from session
         $itemIdsToCheckout = session('checkout_item_ids', []);
         $total = session('checkout_total', 0);
         $cart = Auth::user()->cart;
@@ -145,7 +122,6 @@ class CheckoutController extends Controller
 
         $paymentStatus = ($validated['payment_method'] === 'cod') ? 'unpaid' : 'pending';
 
-        //Database Transaction
         DB::beginTransaction();
 
         try {
@@ -186,15 +162,11 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            // --- vvv 2. THIS IS THE UPDATED EMAIL LOGIC vvv ---
             $order->load('user', 'items.product');
             
-            // Send "OrderPlaced" email to the CUSTOMER
             Mail::to($order->user->email)->send(new OrderPlaced($order));
             
-            // Send "AdminOrderNotification" email to YOU
             Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
-            // --- ^^^ END OF UPDATED LOGIC ^^^ ---
 
             session()->forget('checkout_total');
             session()->forget('checkout_item_ids');
@@ -210,10 +182,6 @@ class CheckoutController extends Controller
             return redirect()->back()->with('error', 'Something went wrong while placing your order. Please try again.');
         }
     }
-
-    /**
-     * Show the order success/thank you page.
-     */
     public function success()
     {
         if (!session('success') || !session('order_tracking_id')) {

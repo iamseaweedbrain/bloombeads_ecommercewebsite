@@ -11,7 +11,7 @@
 
         foreach ($products as $product) {
             $js_products[] = [
-                'id' => $product->id, 
+                'id' => $product->id,
                 'imagePath' => 'storage/' . $product->image_path,
                 'name' => $product->name,
                 'category' => $product->category,
@@ -26,9 +26,9 @@
         $authUrl = route('auth.page');
     @endphp
 
-    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16" 
+    <main class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6 pb-16"
           data-cart-add-url="{{ $isLoggedIn ? route('cart.add') : '' }}">
-        
+
         {{-- Search Bar --}}
         <div id="shop-search-bar" class="py-6">
              <input type="text" placeholder="Search product name, category, or trend..." class="w-full p-2 card-radius border border-gray-300 shadow-soft" oninput="filterProducts(selectedCategory)">
@@ -57,7 +57,7 @@
 
                         <div class="space-y-3 border-t pt-4 border-neutral">
                             <h4 class="font-poppins font-semibold text-dark">Price Range (₱):</h4>
-                            
+
                             <div class="flex justify-between font-poppins text-sm">
                                 <span class="text-dark/70">Min: <span id="desktop-min-price-display" class="price-range-display">₱20</span></span>
                                 <span class="text-dark/70">Max: <span id="desktop-max-price-display" class="price-range-display">₱1000</span></span>
@@ -66,11 +66,11 @@
                             <div class="range-container">
                                 <div class="range-slider-base"></div>
                                 <div id="desktop-range-progress" class="range-progress"></div>
-                                
-                                <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10" 
+
+                                <input id="desktop-min-price-range" type="range" min="20" max="1000" value="20" step="10"
                                        oninput="updatePriceRange('desktop-')" class="range-input" style="z-index: 2;">
-                                
-                                <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10" 
+
+                                <input id="desktop-max-price-range" type="range" min="20" max="1000" value="1000" step="10"
                                        oninput="updatePriceRange('desktop-')" class="range-input">
                             </div>
                         </div>
@@ -141,36 +141,46 @@
 
         <!-- PRODUCT MODAL -->
         <div id="product-modal" class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">
-            <div class="bg-white rounded-2xl shadow-soft max-w-md w-full p-6 relative">
-                <h2 id="modal-product-name" class="text-xl font-fredoka text-dark mb-4"></h2>
-                <img id="modal-product-image" src="" alt="Product Image" class="w-full h-48 object-cover rounded-lg mb-4 bg-gray-100">
-                <p class="text-sakura font-bold text-lg mb-2" id="modal-product-price"></p>
-                <p class="text-sm text-dark/70 mb-1">
-                    <span class="font-semibold">Stock #:</span>
-                    <span id="modal-product-stock">10001</span>
-                </p>
-                <p class="text-sm text-dark/70 mb-1">
-                    <span class="font-semibold">Category:</span>
-                    <span id="modal-product-category"></span>
-                </p>
-                <p class="text-sm text-dark mt-3" id="modal-product-description"></p>
-
-                <button onclick="closeProductModal()" class="mt-6 w-full py-2 bg-sakura text-white font-poppins rounded-xl hover:bg-sakura/90">
-                    Close
-                </button>
+            <div class="bg-white rounded-2xl shadow-xl w-full max-w-2xl h-90 p-6 flex relative">
+                <div class="w-1/2 flex items-center justify-center">
+                    <img id="modal-product-image" src="" alt="Product Image"
+                        class="w-72 h-72 object-cover rounded-xl bg-gray-100" />
+                </div>
+                <div class="w-1/2 pl-6 pr-4 flex flex-col justify-between">
+                    <div>
+                        <button onclick="closeProductModal()"
+                        class="absolute top-4 right-4 text-dark/60 hover:text-dark transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        </button>
+                        <h2 id="modal-product-name" class="text-2xl font-fredoka text-dark mb-4"></h2>
+                        <p id="modal-product-category"
+                        class="inline-block px-3 py-1 rounded-full bg-sakura/20 text-sakura font-medium text-sm mb-4">
+                        </p>
+                        <p id="modal-product-description" class="text-sm text-dark/80 leading-relaxed mt-2"></p>
+                    </div>
+                    <div class="flex items-center justify-between mt-4">
+                        <p class="text-lg font-bold text-dark/70">
+                            <span class="font-bold">Stock:</span>
+                            <span id="modal-product-stock" ></span>
+                        </p>
+                        <p id="modal-product-price" class="text-xl font-bold text-sakura"></p>
+                    </div>
+                </div>
             </div>
         </div>
-        
+
 
         <script src="{{ asset('js/catalog.js') }}"></script>
         <script>
             const PHP_PRODUCTS_DATA = @json($js_products);
-            
+
             window.addEventListener('load', () => {
                 if (typeof lucide !== 'undefined' && lucide.createIcons) {
                     lucide.createIcons();
                 }
-                
+
                 if (typeof initCatalog === 'function') {
                     initCatalog(PHP_PRODUCTS_DATA, {{ $isLoggedIn ? 'true' : 'false' }}, '{{ $authUrl }}');
                 }

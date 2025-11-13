@@ -21,6 +21,24 @@
             </ul>
         </div>
     @endif
+
+    @if($lowStockComponents->isNotEmpty())
+        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 card-radius shadow-soft mb-6" role="alert">
+            <h3 class="font-fredoka font-bold text-lg">Low Component Stock Alerts!</h3>
+            <p class="font-poppins text-sm mb-3">The following components are running low. Please restock soon.</p>
+            <ul class="list-disc list-inside space-y-1">
+                @foreach ($lowStockComponents as $component)
+                    <li class="font-poppins text-sm">
+                        
+                        <a href="{{ route('admin.components.index') }}" class="font-semibold text-red-800 hover:underline">
+                            {{ $component->name }}
+                        </a>
+                        - <span class="font-bold">{{ $component->stock }} {{ Str::plural('item', $component->stock) }} left.</span>
+                    </li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
     <div class="flex border-b border-neutral mb-4">
         @php
             $filters = [

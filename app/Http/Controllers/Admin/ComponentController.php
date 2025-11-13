@@ -75,7 +75,8 @@ class ComponentController extends Controller
             $data['image_path'] = $request->file('image')->store('custom-beads', 'public');
         }
 
-        $component->update($data);
+        unset($data['image']);
+        $component->update($data); // This was your line 78
 
         return redirect()->route('admin.components.index')->with('success', 'Component updated successfully!');
     }

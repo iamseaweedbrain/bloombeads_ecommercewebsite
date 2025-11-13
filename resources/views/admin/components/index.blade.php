@@ -34,7 +34,7 @@
                     @forelse ($components as $component)
                         <tr class="border-b border-neutral/50 hover:bg-neutral/50">
                             <td class="p-4">
-                                <img src="{{ asset($component->image_path) }}" alt="{{ $component->name }}" class="w-12 h-12 object-cover rounded-md">
+                                <img src="{{ asset('storage/' . $component->image_path) }}" alt="{{ $component->name }}" class="w-12 h-12 object-cover rounded-md">
                             </td>
                             <td class="p-4 font-semibold text-dark">{{ $component->name }}</td>
                             <td class="p-4 text-dark/80">{{ $component->componentCategory->name }}</td>

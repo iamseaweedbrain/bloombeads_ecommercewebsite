@@ -17,9 +17,6 @@
                         {{ session('success') }}
                     </div>
                 @endif
-                @if ($errors->has('current_password') || $errors->has('new_password'))
-                    @php setSettingsTab('password'); @endphp
-                @endif
                 <div id="settings-profile-info-content">
                     <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">Account Profile (Name, Email, etc.)</h3>
                     <form action="{{ route('profile.update') }}" method="POST" class="space-y-4 font-poppins">

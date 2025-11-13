@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Carbon\Carbon;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rules\Password;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -19,25 +20,37 @@ class AuthController extends Controller
     public function signUp(Request $request)
     {
         $validated = $request->validate([
-            'fullName' => 'required|string|max:255',
-            'email'    => 'required|email|max:255|unique:useraccount,email',
-            'password' => 'required|string|min:6',
-            'contact_number' => 'nullable|string|max:20',
-            'address'        => 'nullable|string|max:255',
+            'firstName' => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/u'],
+            'lastName'  => ['required', 'string', 'max:50', 'regex:/^[a-zA-Z\s]+$/u'],
+            'email'     => ['required', 'email:rfc,dns', 'max:100', 'unique:useraccount,email', 'regex:/@gmail\.com$/'],
+            'password'  => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                        ->mixedCase()
+                        ->numbers()
+                        ->symbols()
+            ],
+            'contact_number' => ['required', 'string', 'regex:/^(09|\+639)\d{9}$/'],
+            'address'        => ['required', 'string', 'max:255'],
         ]);
         
         try {
-            $user = User::create([
-                'fullName'   => $validated['fullName'],
+            $userId = DB::table('useraccount')->insertGetId([
+                'fullName'   => $validated['firstName'] . ' ' . $validated['lastName'],
                 'email'      => $validated['email'],
                 'password'   => Hash::make($validated['password']),
                 'status'     => 'active',
-                'contact_number'  => $validated['contact_number'] ?? null,
-                'address'         => $validated['address'] ?? null,
+                'contact_number'  => $validated['contact_number'],
+                'address'         => $validated['address'],
+                'created_at'      => now(),
+                'updated_at'      => now(),
             ]);
 
-            // Create a cart for the new user
-            $user->cart()->create();
+            $user = User::find($userId);
+            if ($user) {
+                $user->cart()->create();
+            }
 
         } catch (\Exception $e) {
             $message = 'Database error: ' . $e->getMessage();
@@ -65,20 +78,70 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        // If attempt fails
         return redirect()->route('auth.page')
-                        ->with('login_error', 'Invalid login credentials or inactive account.');
+                         ->with('login_error', 'Invalid login credentials or inactive account.');
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
-     
         $request->session()->regenerateToken();
-     
         return redirect()->route('auth.page');
     }
+
+    public function resetPassword(Request $request)
+    {
+        // 1. Password Format Validation
+        $validated = $request->validate([
+            'reset_token' => 'required|string',
+            'password' => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                        ->mixedCase()
+                        ->numbers()
+                        ->symbols()
+            ],
+        ]);
+        
+        // 2. Token Check
+        $tokenData = DB::table('password_reset_tokens')
+                        ->where('token', $validated['reset_token'])
+                        ->first();
+
+        if (!$tokenData || Carbon::parse($tokenData->created_at)->addMinutes(config('auth.passwords.users.expire', 60))->isPast()) {
+            return response()->json(['message' => 'Invalid or expired token.'], 422);
+        }
+
+        // 3. Find the user from the correct table
+        $user = DB::table('useraccount')->where('email', $tokenData->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found.'], 404);
+        }
+
+        // --- REMOVED: Custom Old Password Check (Hash::check logic) ---
+
+        // 4. Update the password
+        try {
+            DB::table('useraccount')
+                ->where('email', $user->email)
+                ->update([
+                    'password' => Hash::make($validated['password']),
+                    'updated_at' => now()
+                ]);
+
+            DB::table('password_reset_tokens')->where('email', $user->email)->delete();
+
+            return response()->json(['message' => 'Password has been reset successfully. You can now log in.'], 200);
+
+        } catch (\Exception $e) {
+            \Log::error('Password Reset DB Error: ' . $e->getMessage());
+            return response()->json(['message' => 'A server error occurred during password reset.'], 500);
+        }
+    }
+
 
     public function updateProfile(Request $request)
     {
@@ -106,7 +169,6 @@ class AuthController extends Controller
                     'updated_at'      => now()
                 ]);
 
-            // Refresh session
             $updatedUser = DB::table('useraccount')->where('user_id', $user->user_id)->first();
             session(['user' => $updatedUser]);
 
@@ -116,9 +178,6 @@ class AuthController extends Controller
         }
     }
 
-    /* ===============================
-       SETTINGS: UPDATE PASSWORD
-       =============================== */
     public function updatePassword(Request $request)
     {
         $user = Auth::user();
@@ -128,11 +187,22 @@ class AuthController extends Controller
 
         $validated = $request->validate([
             'current_password' => 'required',
-            'new_password'     => 'required|min:6|confirmed',
+            'new_password'     => [
+                'required',
+                'confirmed',
+                Password::min(8)
+                        ->mixedCase()
+                        ->numbers()
+                        ->symbols()
+            ],
         ]);
 
         if (!Hash::check($validated['current_password'], $user->password)) {
             return back()->with('error', 'Current password is incorrect.');
+        }
+
+        if ($validated['current_password'] === $validated['new_password']) {
+            return back()->with('error', 'New password cannot be the same as the old password.');
         }
 
         try {

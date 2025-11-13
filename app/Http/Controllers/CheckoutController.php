@@ -10,7 +10,10 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\CartItem;
 use App\Models\UserActivity;
-use Illuminate\Validation\Rule; // <-- 1. IMPORT THIS
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderPlaced;
+use App\Mail\AdminOrderNotification; // <-- 1. IMPORT THE NEW ADMIN MAILABLE
 
 class CheckoutController extends Controller
 {
@@ -80,6 +83,16 @@ class CheckoutController extends Controller
             ]);
 
             DB::commit();
+            
+            // --- vvv 2. THIS IS THE UPDATED EMAIL LOGIC vvv ---
+            $order->load('user', 'items.product');
+            
+            // Send "OrderPlaced" email to the CUSTOMER
+            Mail::to($order->user->email)->send(new OrderPlaced($order));
+            
+            // Send "AdminOrderNotification" email to YOU
+            Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
+            // --- ^^^ END OF UPDATED LOGIC ^^^ ---
 
             session()->forget('checkout_total');
             session()->forget('checkout_order_id');
@@ -97,6 +110,9 @@ class CheckoutController extends Controller
     }
 
 
+    /**
+     * Finalizes an order that came from the SHOPPING CART.
+     */
     private function finalizeCartOrder(Request $request)
     {
         //Validate
@@ -169,6 +185,16 @@ class CheckoutController extends Controller
             }
 
             DB::commit();
+
+            // --- vvv 2. THIS IS THE UPDATED EMAIL LOGIC vvv ---
+            $order->load('user', 'items.product');
+            
+            // Send "OrderPlaced" email to the CUSTOMER
+            Mail::to($order->user->email)->send(new OrderPlaced($order));
+            
+            // Send "AdminOrderNotification" email to YOU
+            Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
+            // --- ^^^ END OF UPDATED LOGIC ^^^ ---
 
             session()->forget('checkout_total');
             session()->forget('checkout_item_ids');

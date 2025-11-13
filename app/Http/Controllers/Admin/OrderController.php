@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
+use App\Models\Component;
+use Illuminate\Support\Facades\Mail; // <-- 1. IMPORT MAIL
+use App\Mail\OrderShipped;            // <-- 2. IMPORT THE MAILABLE
 
 class OrderController extends Controller
 {
-    /**
-     * Display a listing of all orders.
-     */
     public function index(Request $request)
     {
         $query = Order::with('user');
@@ -28,9 +28,6 @@ class OrderController extends Controller
         ]);
     }
 
-    /**
-     * Display the specified order and its items.
-     */
     public function show(Order $order)
     {
         $order->load('user', 'items.product');
@@ -52,39 +49,26 @@ class OrderController extends Controller
 
         $newPaymentStatus = $request->payment_status;
         $newOrderStatus = $request->order_status;
-        $paymentMethod = $order->payment_method; // Get the order's payment method
+        $oldStatus = $order->order_status;
+        $paymentMethod = $order->payment_method;
 
-        // --- vvv NEW VALIDATION LOGIC vvv ---
-
-        // RULE 1: If payment is Failed, order MUST be Cancelled.
-        if ($newPaymentStatus == 'failed' && $newOrderStatus != 'cancelled') {
-            return redirect()->back()->with('error', 'If Payment Status is "Failed", Order Status must be set to "Cancelled".');
+        // --- Validation Logic ---
+        if (
+            ($newPaymentStatus === 'pending' || $newPaymentStatus === 'failed') &&
+            (in_array($newOrderStatus, ['processing', 'shipped', 'delivered']))
+        ) {
+            return redirect()->back()->with('error', 'You cannot mark an order as Processing, Shipped, or Delivered if the payment is still Pending or has Failed.');
         }
-
-        // RULE 2: If payment is set to Failed, force Order Status to Cancelled
-        if ($newPaymentStatus == 'failed') {
-            $newOrderStatus = 'cancelled';
-        }
-
-        // RULE 3: If method is GCash/Maya, payment MUST be 'paid' to process/ship/deliver.
         if (in_array($paymentMethod, ['gcash', 'maya']) && $newPaymentStatus != 'paid') {
             if (in_array($newOrderStatus, ['processing', 'shipped', 'delivered'])) {
                 return redirect()->back()->with('error', 'GCash/Maya orders must be "Paid" before they can be Processed, Shipped, or Delivered.');
             }
         }
         
-        // (Note: COD orders are automatically allowed, because $paymentMethod is 'cod',
-        // so the rule above is skipped. They can be 'unpaid' and 'shipped'.)
-
-        // --- ^^^ END OF NEW LOGIC ^^^ ---
-
-
-        // Restock Logic: Check if status is being set to 'cancelled'
-        if ($newOrderStatus == 'cancelled' && $order->order_status != 'cancelled') {
-            
-            $order->load('items.product');
-
-            foreach ($order->items as $item) {
+        // Restock logic
+        if ($newOrderStatus == 'cancelled' && $oldStatus != 'cancelled') {
+            $order->load('items.product'); // Load items to restock
+            foreach($order->items as $item) {
                 if ($item->product) {
                     $item->product->increment('stock', $item->quantity);
                 }
@@ -96,8 +80,16 @@ class OrderController extends Controller
         $order->order_status = $newOrderStatus;
         $order->save();
 
-        // --- vvv NEW REDIRECT vvv ---
-        // Redirect back to the main transactions list page
+        // --- vvv 3. SEND "ORDER SHIPPED" EMAIL vvv ---
+        // Check if the new status is 'shipped' AND the old status was NOT 'shipped'
+        if ($newOrderStatus == 'shipped' && $oldStatus != 'shipped') {
+            $order->load('user', 'items.product');
+            
+            // Use ->send() to send it instantly
+            Mail::to($order->user->email)->send(new OrderShipped($order));
+        }
+        // --- ^^^ END OF EMAIL LOGIC ^^^ ---
+
         return redirect()->route('admin.transactions')->with('success', "Order #{$order->order_tracking_id} has been updated!");
     }
 }

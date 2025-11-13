@@ -92,7 +92,7 @@
                 <h2 class="text-lg font-semibold text-gray-800 mb-2">Visit us on</h2>
                 <ul class="space-y-2 text-gray-700">
                     <li class="flex items-center justify-center md:justify-end space-x-3">
-                        <a href="https://facebooklink.com" class="text-gray-800 hover:underline">https://facebooklink.com//</a>
+                        <a href="https://www.facebook.com/share/19EPYwYQMs/" class="text-gray-800 hover:underline">https://facebooklink.com//</a>
                         <span class="bg-sakura text-white rounded-full p-2 flex items-center justify-center">
                             <i class="fa-brands fa-facebook" class="w-4 h-4"></i>
                         </span>
@@ -104,7 +104,7 @@
                         </span>
                     </li>
                     <li class="flex items-center justify-center md:justify-end space-x-3">
-                        <a href="https://tiktoklink.com" class="text-gray-800 hover:underline">https://tiktoklink.com//</a>
+                        <a href="https://vt.tiktok.com/ZSyWHtyJt/?page=TikTokShop" class="text-gray-800 hover:underline">https://tiktoklink.com//</a>
                         <span class="bg-sakura text-white rounded-full p-2 flex items-center justify-center">
                             <i class="fa-brands fa-tiktok" class="w-4 h-4"></i>
                         </span>

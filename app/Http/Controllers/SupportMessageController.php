@@ -7,7 +7,7 @@ use App\Models\SupportMessage;
 use App\Models\UserActivity;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
-
+use App\Models\Component;
 class SupportMessageController extends Controller
 {
     public function store(Request $request)
@@ -56,11 +56,14 @@ class SupportMessageController extends Controller
         $lowStockProducts = Product::where('stock', '<=', 5)
                                    ->orderBy('stock', 'asc')
                                    ->get();
-
+        $lowStockComponents = Component::where('stock', '<=', 50) 
+                                        ->orderBy('stock', 'asc')
+                                        ->get();
         return view('admin.notifications', [
             'messages' => $messages,
             'activeFilter' => $filter,
-            'lowStockProducts' => $lowStockProducts
+            'lowStockProducts' => $lowStockProducts,
+            'lowStockComponents' => $lowStockComponents
         ]);
     }
 

@@ -9,25 +9,38 @@
                 Please sign in or sign up to continue.
             </div>
 
-            <div id="auth-status-message" class="h-6 font-poppins text-sm mb-4 text-center">
+            <div id="auth-status-message" class="h-6 font-poppins text-sm mb-4 text-center @if(session('success')) text-green-600 @elseif(session('error')) text-sakura @endif">
                 @if(session('success'))
                     {{ session('success') }}
                 @endif
                 @if(session('error'))
                     {{ session('error') }}
                 @endif
+                @if(session('login_error')) 
+                    {{ session('login_error') }}
+                @endif
             </div>
 
             <div id="signin-form-container" class="space-y-4">
                 <form id="signin-form" method="POST" action="{{ route('auth.login') }}" class="space-y-4">
                     @csrf
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
+                    <div>
+                        <input type="email" name="email" placeholder="Email Address" value="{{ old('email') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        @error('email')
+                            <div class="text-sakura text-sm text-left mt-1">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    
                     <div class="relative">
                         <input type="password" name="password" id="login-password" placeholder="Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('login-password')">
                             <i class="far fa-eye" id="toggle-login-password"></i>
                         </span>
                     </div>
+                    @error('password')
+                        <div class="text-sakura text-sm text-left -mt-3 mb-3">{{ $message }}</div>
+                    @enderror
+
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         LOG IN
                     </button>
@@ -45,18 +58,65 @@
             </div>
 
             <div id="signup-form-container" class="space-y-4 hidden">
-                <form id="signup-form" method="POST" action="{{ route('auth.signup') }}" class="space-y-4">
+                <form id="signup-form" method="POST" action="{{ route('auth.signup') }}" class="space-y-4" novalidate>
                     @csrf
-                    <input type="text" name="fullName" placeholder="Full Name" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
-                    <input type="email" name="email" placeholder="Email Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky mb-4">
-                    <div class="relative mb-4">
-                        <input type="password" name="password" id="signup-password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
-                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('signup-password')">
-                            <i class="far fa-eye" id="toggle-signup-password"></i>
+                    
+                    <div>
+                        <input type="text" name="firstName" id="firstName" placeholder="First Name" value="{{ old('firstName') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        <div id="firstName-error" class="text-sakura text-sm text-left mt-1">
+                            @error('firstName') {{ $message }} @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="text" name="lastName" id="lastName" placeholder="Last Name" value="{{ old('lastName') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        <div id="lastName-error" class="text-sakura text-sm text-left mt-1">
+                            @error('lastName') {{ $message }} @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="email" name="email" id="email" placeholder="Email Address (must be @gmail.com)" value="{{ old('email') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        <div id="email-error" class="text-sakura text-sm text-left mt-1">
+                            @error('email') {{ $message }} @enderror
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <input type="password" name="password" id="password" placeholder="Create Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('password')">
+                            <i class="far fa-eye" id="toggle-password"></i>
                         </span>
                     </div>
-                    <input type="number" name="contact_number" placeholder="Phone Number" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
-                    <input type="text" name="address" placeholder="Home Address" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                    <div id="password-error" class="text-sakura text-sm text-left -mt-3 mb-3">
+                        @error('password') {{ $message }} @enderror
+                    </div>
+
+                    <div class="relative">
+                        <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
+                        <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('password_confirmation')">
+                            <i class="far fa-eye" id="toggle-password_confirmation"></i>
+                        </span>
+                    </div>
+                    <div id="password_confirmation-error" class="text-sakura text-sm text-left -mt-3 mb-3">
+                         @error('password_confirmation') {{ $message }} @enderror
+                    </div>
+
+
+                    <div>
+                        <input type="text" name="contact_number" id="contact_number" placeholder="Phone Number (e.g., 09171234567)" value="{{ old('contact_number') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        <div id="contact_number-error" class="text-sakura text-sm text-left mt-1">
+                            @error('contact_number') {{ $message }} @enderror
+                        </div>
+                    </div>
+
+                    <div>
+                        <input type="text" name="address" id="address" placeholder="Home Address" value="{{ old('address') }}" required class="w-full border border-neutral rounded-lg p-2 focus:outline-sky">
+                        <div id="address-error" class="text-sakura text-sm text-left mt-1">
+                            @error('address') {{ $message }} @enderror
+                        </div>
+                    </div>
+
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
                         SIGN UP
                     </button>
@@ -110,12 +170,14 @@
                             <i class="far fa-eye" id="toggle-reset-new-password"></i>
                         </span>
                     </div>
+                    <div id="reset-new-password-error" class="text-sakura text-sm text-left -mt-3 mb-3"></div>
                     <div class="relative mb-4">
                         <input type="password" name="password_confirmation" id="reset-confirm-password" placeholder="Confirm Password" required class="w-full border border-neutral rounded-lg p-2 pr-10 focus:outline-sky">
                         <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('reset-confirm-password')">
                             <i class="far fa-eye" id="toggle-reset-confirm-password"></i>
                         </span>
                     </div>
+                    <div id="reset-confirm-password-error" class="text-sakura text-sm text-left -mt-3 mb-3"></div>
                     <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-sakura hover:bg-opacity-90 transition-default shadow-soft">
                         CHANGE PASSWORD
                     </button>
@@ -129,7 +191,7 @@
 
         function setActiveView(view, event = null) {
             if (event) event.preventDefault();
-
+            
             const signIn = document.getElementById('signin-form-container');
             const signUp = document.getElementById('signup-form-container');
             const forgotPassword = document.getElementById('forgot-password-container');
@@ -140,11 +202,23 @@
             const authMessage = document.getElementById('auth-message');
             const status = document.getElementById('auth-status-message');
 
+            const forms = [
+                document.getElementById('signin-form'),
+                document.getElementById('signup-form'),
+                document.getElementById('forgot-password-form'),
+                document.getElementById('otp-verify-form'),
+                document.getElementById('reset-password-form')
+            ];
+            forms.forEach(form => form?.reset());
+
+            const errorMessages = document.querySelectorAll('[id$="-error"]');
+            errorMessages.forEach(el => el.textContent = '');
+
             signIn.classList.add('hidden');
             signUp.classList.add('hidden');
             forgotPassword.classList.add('hidden');
             otpContainer.classList.add('hidden');
-            resetPassword.classList.add('hidden'); // Hide new container
+            resetPassword.classList.add('hidden'); 
 
             let titleText = '';
             let messageText = 'Please sign in or sign up to continue.';
@@ -172,7 +246,6 @@
             
             authTitle.textContent = titleText;
             authMessage.textContent = messageText;
-            status.textContent = ''; 
         }
 
         function showMessage(message, colorClass = '') {
@@ -181,7 +254,6 @@
             status.textContent = message;
             console.error(message);
 
-            // Clear status message after 3 seconds
             setTimeout(() => {
                 status.textContent = '';
                 status.className = 'h-6 font-poppins text-sm mb-4 text-center';
@@ -204,16 +276,123 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            
+            const hasSignupErrors = {!! $errors->any() && (old('firstName') || old('lastName') || old('password') || old('contact_number') || old('address')) ? 'true' : 'false' !!};
+            if (hasSignupErrors) {
+                setActiveView('signup');
+            }
+            
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
+            
             const signupForm = document.getElementById('signup-form');
             if (signupForm) {
-                signupForm.addEventListener('submit', async (e) => {
-                   // e.preventDefault();
-                    const formData = new FormData(signupForm);
+                const firstName = document.getElementById('firstName');
+                const lastName = document.getElementById('lastName');
+                const email = document.getElementById('email');
+                const password = document.getElementById('password');
+                const passwordConfirm = document.getElementById('password_confirmation');
+                const contactNumber = document.getElementById('contact_number');
+                const address = document.getElementById('address');
+
+                const firstNameError = document.getElementById('firstName-error');
+                const lastNameError = document.getElementById('lastName-error');
+                const emailError = document.getElementById('email-error');
+                const passwordError = document.getElementById('password-error');
+                const passwordConfirmError = document.getElementById('password_confirmation-error');
+                const contactNumberError = document.getElementById('contact_number-error');
+                const addressError = document.getElementById('address-error');
+
+                const nameRegex = /^[a-zA-Z\s]+$/;
+                const phoneRegex = /^(\+63|0)9\d{9}$/;
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                const setError = (el, message) => {
+                    if (el) el.textContent = message;
+                };
+
+                firstName.addEventListener('input', () => {
+                    if (firstName.value.trim() === '') {
+                        setError(firstNameError, 'First name is required.');
+                    } else if (!nameRegex.test(firstName.value)) {
+                        setError(firstNameError, 'First name must contain letters only.');
+                    } else {
+                        setError(firstNameError, '');
+                    }
+                });
+
+                lastName.addEventListener('input', () => {
+                    if (lastName.value.trim() === '') {
+                        setError(lastNameError, 'Last name is required.');
+                    } else if (!nameRegex.test(lastName.value)) {
+                        setError(lastNameError, ' name must contain letters only.');
+                    } else {
+                        setError(lastNameError, '');
+                    }
+                });
+
+                email.addEventListener('input', () => {
+                    if (email.value.trim() === '') {
+                        setError(emailError, 'Email is required.');
+                    } else if (!emailRegex.test(email.value)) {
+                        setError(emailError, 'Please enter a valid email format.');
+                    } else if (!email.value.endsWith('@gmail.com')) {
+                        setError(emailError, 'Email must end at @gmail.com.');
+                    } else {
+                        setError(emailError, '');
+                    }
+                });
+
+                password.addEventListener('input', () => {
+                    const val = password.value;
+                    let errors = [];
+                    if (val.length < 8) errors.push('at least 8 characters');
+                    if (!/[A-Z]/.test(val)) errors.push('1 uppercase letter');
+                    if (!/\d/.test(val)) errors.push('1 number');
+                    if (!/[!@#$%^&*()]/.test(val)) errors.push('1 special character');
+
+                    if (errors.length > 0) {
+                        setError(passwordError, 'Password must contain: ' + errors.join(', ') + '.');
+                    } else {
+                        setError(passwordError, '');
+                    }
+                    if (passwordConfirm.value !== '') {
+                        if (password.value !== passwordConfirm.value) {
+                            setError(passwordConfirmError, 'Passwords do not match.');
+                        } else {
+                            setError(passwordConfirmError, '');
+                        }
+                    }
+                });
+
+                passwordConfirm.addEventListener('input', () => {
+                    if (passwordConfirm.value === '') {
+                        setError(passwordConfirmError, 'Please confirm your password.');
+                    } else if (password.value !== passwordConfirm.value) {
+                        setError(passwordConfirmError, 'Passwords do not match.');
+                    } else {
+                        setError(passwordConfirmError, '');
+                    }
+                });
+
+                contactNumber.addEventListener('input', () => {
+                    if (contactNumber.value.trim() === '') {
+                        setError(contactNumberError, 'Phone number is required.');
+                    } else if (!phoneRegex.test(contactNumber.value)) {
+                        setError(contactNumberError, 'Must be a valid Philippine number (e.g., 09xxxxxxxxx).');
+                    } else {
+                        setError(contactNumberError, '');
+                    }
+                });
+
+                address.addEventListener('input', () => {
+                    if (address.value.trim() === '') {
+                        setError(addressError, 'Address must be filled.');
+                    } else {
+                        setError(addressError, '');
+                    }
                 });
             }
-
+            
             const forgotPasswordForm = document.getElementById('forgot-password-form');
             if (forgotPasswordForm) {
                 forgotPasswordForm.addEventListener('submit', async (e) => {
@@ -237,7 +416,7 @@
                         const data = isJson ? await response.json() : {};
 
                         if (response.ok) {
-                            showMessage(data.message || 'OTP sent! Please check your email.', 'text-cta');
+                            showMessage(data.message || 'OTP sent! Please check your email.', 'text-green-600');
                             setActiveView('otp');
                         } else {
                             const message = data.message || (response.status === 422 ? 'Invalid email format.' : 'Failed to send OTP. Check console.');
@@ -275,7 +454,7 @@
                         const data = isJson ? await response.json() : {};
 
                         if (response.ok && data.reset_token) {
-                            showMessage('Code verified! Set your new password.', 'text-cta');
+                            showMessage('Code verified! Set your new password.', 'text-green-600');
                             document.getElementById('reset-token-input').value = data.reset_token;
                             setActiveView('reset'); 
                         } else {
@@ -311,7 +490,7 @@
                         const data = isJson ? await response.json() : {};
 
                         if (response.ok) {
-                            showMessage(data.message || 'Password successfully changed!', 'text-cta');
+                            showMessage(data.message || 'Password successfully changed!', 'text-green-600');
                             setActiveView('signin');
                         } else {
                             const message = data.message || (response.status === 422 ? 'Password validation failed.' : 'Reset failed. Check console.');

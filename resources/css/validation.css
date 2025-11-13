@@ -1,0 +1,31 @@
+.password-checklist {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.875rem; 
+    color: #6b7280;
+    text-align: left;
+    margin-top: 12px;
+    padding-left: 10px;
+}
+.password-checklist li {
+    list-style-type: none;
+    padding-left: 24px;
+    position: relative;
+    margin-bottom: 4px;
+    transition: color 0.3s;
+}
+.password-checklist li::before {
+    content: '○';
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+    top: 0px;
+    color: #ef4444;
+    transition: all 0.3s;
+}
+.password-checklist li.valid {
+    color: #22c55e;
+}
+.password-checklist li.valid::before {
+    content: '✓';
+    color: #22c55e;
+}

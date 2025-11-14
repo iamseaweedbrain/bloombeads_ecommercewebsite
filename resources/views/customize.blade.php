@@ -117,31 +117,6 @@
         </div>
     </main>
 
-    <div id="guest-info-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-        <div class="bg-white p-8 card-radius shadow-soft w-full max-w-md">
-            <h2 class="text-2xl font-fredoka font-bold text-center mb-4">Almost there!</h2>
-            <p class="font-poppins text-dark/70 text-center mb-6">Please provide your details so we can email you with a quote.</p>
-            <form id="guest-info-form" class="space-y-4">
-                <div>
-                    <label for="customer_name" class="font-poppins font-semibold">Full Name</label>
-                    <input type="text" id="customer_name" class="w-full p-3 card-radius border border-gray-300 mt-1" required>
-                </div>
-                <div>
-                    <label for="customer_email" class="font-poppins font-semibold">Email</label>
-                    <input type="email" id="customer_email" class="w-full p-3 card-radius border border-gray-300 mt-1" required>
-                </div>
-                <div class="flex gap-4 pt-4">
-                    <button type="button" id="cancel-quote-btn" class="w-1/2 py-3 font-fredoka font-bold card-radius bg-neutral text-dark hover:bg-gray-200">
-                        Cancel
-                    </button>
-                    <button type="submit" class="w-1/2 py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90">
-                        Confirm & Submit
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const TOTAL_SLOTS = 50;
@@ -152,9 +127,6 @@
             const itemsListEl = document.getElementById('custom-items-list');
             const slotsRemainingEl = document.getElementById('slots-remaining');
             const submitBtn = document.getElementById('submit-design-btn');
-            const guestModal = document.getElementById('guest-info-modal');
-            const guestForm = document.getElementById('guest-info-form');
-            const cancelBtn = document.getElementById('cancel-quote-btn');
             
             const csrfTokenEl = document.querySelector('meta[name="csrf-token"]');
             const csrfToken = csrfTokenEl ? csrfTokenEl.getAttribute('content') : null;
@@ -402,21 +374,15 @@
                 @if(Auth::check())
                     submitDesign(design, "{{ Auth::user()->fullName }}", "{{ Auth::user()->email }}");
                 @else
-                    guestModal.classList.remove('hidden');
+                    if (typeof showToast === 'function') {
+                        showToast('Please log in to submit a design for a quote.', 'error');
+                    } else {
+                        alert('Please log in to submit a design for a quote.');
+                    }
+                    setTimeout(() => {
+                        window.location.href = '{{ route("auth.page") }}';
+                    }, 2000);
                 @endif
-            });
-            
-            cancelBtn.addEventListener('click', () => guestModal.classList.add('hidden'));
-
-            guestForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const design = braceletSlots.map(s => (s && s.is_primary) ? s.id : 0);
-                const name = document.getElementById('customer_name').value;
-                const email = document.getElementById('customer_email').value;
-                
-                if (name && email) {
-                    submitDesign(design, name, email);
-                }
             });
 
             function submitDesign(design, name, email) {
@@ -450,7 +416,6 @@
                         if (typeof showToast === 'function') {
                             showToast(data.message, 'success');
                         }
-                        guestModal.classList.add('hidden');
                         document.getElementById('reset-bracelet-btn').click();
                     } else {
                         throw new Error(data.message || 'Submission failed.');

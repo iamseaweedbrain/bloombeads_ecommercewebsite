@@ -1,4 +1,37 @@
 <x-layout>
+    {{-- 1. ADDED STYLES for the bracelet preview --}}
+    <style>
+        .bracelet-preview-container {
+            position: relative;
+            width: 350px; /* A bit smaller for the modal */
+            height: 350px;
+            margin: 1rem auto;
+        }
+        .bracelet-slot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 30px;  /* A bit smaller for the modal */
+            height: 30px;
+            margin: -15px; /* Half of the width/height */
+            border-radius: 50%;
+            background-color: #f0f0f0;
+            border: 2px dashed #d1d5db;
+            background-size: cover;
+            background-position: center;
+        }
+        .bracelet-slot.filled {
+            border: 2px solid var(--color-sakura);
+            background-color: white;
+        }
+        
+        /* Modal Styles */
+        #design-preview-modal {
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease;
+        }
+    </style>
+
     <section id="dashboard-view" class="py-12 md:py-16">
         <h2 class="text-3xl font-fredoka font-bold mb-8 md:mb-12">Account Dashboard</h2>
 
@@ -58,16 +91,28 @@
                                         <p class="font-fredoka font-bold text-sm uppercase text-green-600">ORDER PLACED</p>
                                         <p class="text-sm text-dark/70 mt-1">This design has been converted into an order.</p>
                                     @endif
+
+                                    {{-- 2. ADDED "View Design" Button --}}
+                                    <button onclick="showDesignPreview({{ json_encode($design->design_data) }})" 
+                                            class="mt-2 text-sm text-sky font-semibold hover:underline">
+                                        View Design
+                                    </button>
+
                                 </div>
                                 <div class="mt-3 sm:mt-0 text-right">
                                     @if($design->status == 'quoted')
                                         <p class="font-poppins font-bold text-xl text-sakura">₱{{ number_format($design->final_price, 2) }}</p>
-                                        <form action="{{ route('customize.accept', $design) }}" method="POST" class="mt-2">
-                                            @csrf
-                                            <button type="submit" class="inline-block py-2 px-5 font-poppins font-semibold card-radius text-white bg-cta hover:bg-opacity-80 transition-default">
-                                                Accept & Pay
-                                            </button>
-                                        </form>
+                                        
+                                        {{-- 3. FIXED "Accept & Pay" BUG --}}
+                                        {{-- This is now a simple link to your checkout page. --}}
+                                        {{-- You must create this route: route('checkout.design', $design) --}}
+                                        {{-- This route should be a GET route that SHOWS the checkout page. --}}
+                                       <form action="{{ route('checkout.createFromDesign', $design) }}" method="POST" class="mt-2">
+                                        @csrf
+                                        <button type="submit" class="inline-block py-2 px-5 font-poppins font-semibold card-radius text-white bg-cta hover:bg-opacity-80 transition-default">
+                                            Accept & Pay
+                                        </button>
+                                    </form> 
                                     @endif
                                 </div>
                             </div>
@@ -192,33 +237,153 @@
         </div>
     </section>
 
+    {{-- 4. ADDED MODAL HTML --}}
+    <div id="design-preview-modal" onclick="closeDesignPreview()" 
+         class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden opacity-0">
+        <div class="bg-white card-radius shadow-soft max-w-lg w-full p-6 relative" onclick="event.stopPropagation()">
+            <h3 class="text-2xl font-fredoka font-bold text-dark mb-4">Design Preview</h3>
+            
+            <div class="bracelet-preview-container">
+                <div id="modal-preview-circle"></div>
+            </div>
+
+            <button onclick="closeDesignPreview()" 
+                    class="absolute top-4 right-4 text-dark/60 hover:text-sakura transition-default">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+    </div>
+
+
     <script>
+        {{-- 5. ADDED JAVASCRIPT LOGIC --}}
+
+        // Assumes your controller passes $allComponents to this view
+        const ALL_COMPONENTS = @json($allComponents ?? []); 
+        const TOTAL_SLOTS = 50;
+
+        function showDesignPreview(designData) {
+            if (Object.keys(ALL_COMPONENTS).length === 0) {
+                console.error("Component list is missing. Make sure your controller passes $allComponents.");
+                alert("Error: Could not load component data to show preview.");
+                return;
+            }
+
+            const previewCircle = document.getElementById('modal-preview-circle');
+            const modal = document.getElementById('design-preview-modal');
+            previewCircle.innerHTML = ''; // Clear previous preview
+
+            const radius = 160; // Smaller radius for 350px container
+            const center = 175; // Center for 350px container
+            const baseSize = 30;
+            
+            let i = 0;
+            while (i < TOTAL_SLOTS) {
+                const componentId = designData[i];
+                const component = (componentId && componentId !== 0) ? ALL_COMPONENTS[componentId] : null;
+
+                const slot = document.createElement('div');
+                slot.className = 'bracelet-slot';
+
+                const angle = (i / TOTAL_SLOTS) * 2 * Math.PI;
+                const x = center + radius * Math.cos(angle);
+                const y = center + radius * Math.sin(angle);
+
+                if (component) {
+                    const size = component.slot_size || 1;
+                    
+                    // Use the full_image_url from the Component model
+                    slot.style.backgroundImage = `url(${component.full_image_url})`; 
+                    slot.classList.add('filled');
+                    slot.style.zIndex = '10';
+
+                    if (size > 1) {
+                        const midAngle = ((i + (size - 1) / 2) / TOTAL_SLOTS) * 2 * Math.PI;
+                        const midX = center + radius * Math.cos(midAngle);
+                        const midY = center + radius * Math.sin(midAngle);
+                        
+                        const newSize = baseSize * (1 + (size - 1) * 0.3); 
+
+                        slot.style.width = `${newSize}px`;
+                        slot.style.height = `${newSize}px`;
+                        slot.style.margin = `-${newSize / 2}px`;
+                        slot.style.left = `${midX}px`;
+                        slot.style.top = `${midY}px`;
+                        slot.style.transform = 'rotate(0rad)';
+                        slot.style.backgroundSize = 'contain';
+                    } else {
+                        slot.style.width = `${baseSize}px`;
+                        slot.style.height = `${baseSize}px`;
+                        slot.style.margin = `-${baseSize / 2}px`;
+                        slot.style.left = `${x}px`;
+                        slot.style.top = `${y}px`;
+                        slot.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+                        slot.style.backgroundSize = 'cover';
+                    }
+                    
+                    previewCircle.appendChild(slot);
+                    i += size;
+
+                } else {
+                    slot.style.width = `${baseSize}px`;
+                    slot.style.height = `${baseSize}px`;
+                    slot.style.margin = `-${baseSize / 2}px`;
+                    slot.style.left = `${x}px`;
+                    slot.style.top = `${y}px`;
+                    slot.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+                    
+                    previewCircle.appendChild(slot);
+                    i++;
+                }
+            }
+            
+            // Show the modal
+            modal.classList.remove('hidden');
+            setTimeout(() => modal.classList.remove('opacity-0'), 10);
+        }
+
+        function closeDesignPreview() {
+            const modal = document.getElementById('design-preview-modal');
+            modal.classList.add('opacity-0');
+            setTimeout(() => modal.classList.add('hidden'), 300);
+        }
+
+        // --- Existing Tab Logic ---
         function setDashboardTab(tabId) {
+            // Hide all content panes
             document.getElementById('dashboard-user-info-content').classList.add('hidden');
             document.getElementById('dashboard-activity-content').classList.add('hidden');
             document.getElementById('dashboard-orders-content').classList.add('hidden');
             document.getElementById('dashboard-designs-content').classList.add('hidden'); 
             
-            document.getElementById('dashboard-' + tabId + '-content').classList.remove('hidden');
+            // Show the selected one
+            const contentEl = document.getElementById('dashboard-' + tabId + '-content');
+            if (contentEl) {
+                contentEl.classList.remove('hidden');
+            }
 
+            // Update tab button styles
             document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
                 if (!btn.closest('form')) {
                     btn.classList.remove('bg-sakura', 'text-white');
-                    btn.classList.add('bg-neutral', 'text-dark');
+                    // We don't need to add bg-neutral, it should be the default
                 }
             });
             
             const activeBtn = document.getElementById('tab-btn-' + tabId);
             if (activeBtn) {
-                activeBtn.classList.remove('bg-neutral', 'text-dark');
                 activeBtn.classList.add('bg-sakura', 'text-white');
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const currentUrl = new URL(window.location.href);
+            const activeTab = currentUrl.searchParams.get('tab');
+            
             if (currentUrl.searchParams.has('status')) {
                 setDashboardTab('orders');
+            } else if (activeTab) {
+                setDashboardTab(activeTab);
             } else {
                 setDashboardTab('user-info');
             }

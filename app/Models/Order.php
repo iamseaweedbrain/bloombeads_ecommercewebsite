@@ -31,4 +31,8 @@ class Order extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+    public function customDesign()
+    {
+        return $this->belongsTo(CustomDesign::class);
+    }
 }

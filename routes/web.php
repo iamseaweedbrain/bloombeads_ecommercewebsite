@@ -62,7 +62,7 @@ Route::middleware('auth')->group(function () {
 
     // --- CHECKOUT & PAYMENT ROUTES ---
     Route::get('/payment', [CheckoutController::class, 'showPaymentPage'])
-         ->name('payment.show');
+         ->name('checkout.payment');
 
     Route::post('/checkout/process', [CheckoutController::class, 'process'])
          ->name('checkout.process');
@@ -72,6 +72,12 @@ Route::middleware('auth')->group(function () {
          
     Route::get('/order/{order:order_tracking_id}', [DashboardController::class, 'show'])
          ->name('order.show');
+
+     Route::post('/order/{order}/cancel', [DashboardController::class, 'cancel'])
+         ->name('order.cancel');
+         
+     Route::post('/checkout/create-from-design/{design}', [CheckoutController::class, 'createOrderFromDesign'])
+         ->name('checkout.createFromDesign');
 });
 
 

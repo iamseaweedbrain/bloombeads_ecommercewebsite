@@ -4,7 +4,6 @@
 <section id="component-management" class="font-poppins">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-fredoka font-bold">Component Management</h2>
-        {{-- This uses the correct component modal function --}}
         <button onclick="openComponentModal('add')" class="py-2 px-4 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
             Add New Component
         </button>
@@ -117,7 +116,6 @@
 </div>
 @push('scripts')
 <script>
-    // Component Management Logic (Modal and Fetching)
     const componentModal = document.getElementById('componentModal');
     const componentForm = document.getElementById('componentForm');
     const componentModalTitle = document.getElementById('component-modalTitle');
@@ -126,6 +124,38 @@
     const componentCurrentImageSpan = document.getElementById('component-currentImage');
     const componentImageInput = document.getElementById('componentImage');
     
+    const componentCategorySelect = document.getElementById('componentCategory');
+    const componentSlotSizeInput = document.getElementById('slotSize');
+    
+    if (componentForm) {
+        componentForm.addEventListener('submit', () => {
+            if (componentSlotSizeInput.disabled) {
+                componentSlotSizeInput.disabled = false;
+            }
+        });
+    }
+
+    function updateSlotSize() {
+        if (!componentCategorySelect || !componentSlotSizeInput) return;
+
+        const selectedOptionText = componentCategorySelect.options[componentCategorySelect.selectedIndex].text;
+
+        if (selectedOptionText === 'Beads') {
+            componentSlotSizeInput.value = 1;
+            componentSlotSizeInput.disabled = true;
+        } else if (selectedOptionText === 'Charms') {
+            componentSlotSizeInput.value = 2;
+            componentSlotSizeInput.disabled = true;
+        } else {
+            componentSlotSizeInput.value = componentSlotSizeInput.value || 1;
+            componentSlotSizeInput.disabled = false;
+        }
+    }
+
+    if (componentCategorySelect) {
+        componentCategorySelect.addEventListener('change', updateSlotSize);
+    }
+
     const baseEditUrl = '{{ url("admin/components") }}';
     const baseStoreUrl = '{{ route("admin.components.store") }}';
     
@@ -133,6 +163,7 @@
         if (!componentModal) return; 
         
         componentForm.reset();
+        componentSlotSizeInput.disabled = false; 
         componentCurrentImageSpan.textContent = '';
         componentForm.action = baseStoreUrl;
         componentFormMethod.value = 'POST';
@@ -141,6 +172,7 @@
             componentModalTitle.textContent = 'Add New Component';
             componentSaveButton.textContent = 'Add Component';
             componentImageInput.required = true;
+            updateSlotSize();
         } else if (mode === 'edit' && componentId) {
             componentModalTitle.textContent = 'Edit Component';
             componentSaveButton.textContent = 'Update Component';
@@ -157,6 +189,8 @@
                     
                     componentForm.action = `${baseEditUrl}/${componentId}`;
                     componentFormMethod.value = 'PUT'; 
+
+                    updateSlotSize();
                 })
                 .catch(error => {
                     alert('Failed to load component data. See console for details.');

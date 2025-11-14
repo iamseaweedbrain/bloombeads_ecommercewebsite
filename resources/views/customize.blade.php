@@ -1,4 +1,5 @@
 <x-layout>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         .bracelet-preview-container {
             position: relative;
@@ -24,6 +25,7 @@
         .bracelet-slot.filled {
             border: 2px solid var(--color-sakura);
             box-shadow: 0 0 5px var(--color-sakura);
+            background-repeat: no-repeat;
         }
         .bracelet-slot.hover-target {
             background-color: #fef2f2;
@@ -63,7 +65,6 @@
 
             <aside class="lg:col-span-1 space-y-8">
                 
-                <!-- Component Selection -->
                 <div class="bg-white p-6 card-radius shadow-soft sticky top-24">
                     <h2 class="text-2xl font-fredoka font-bold mb-4">Components</h2>
                             
@@ -75,7 +76,7 @@
                                 <div class="grid grid-cols-4 gap-2"> 
                                     @forelse ($category->components as $component)
                                         @php
-                                            $imageUrl = $component->image_path ? asset($component->image_path) : 'https://placehold.co/64x64/f0f0f0/333?text=B';
+                                            $imageUrl = $component->image_path ? asset('storage/' . $component->image_path) : 'https://placehold.co/64x64/f0f0f0/333?text=B';
                                         @endphp
                                         <button class="component-btn border border-neutral rounded-lg p-1 text-center hover:border-sky"
                                                 data-id="{{ $component->id }}"
@@ -100,7 +101,6 @@
                     </div>
                 </div>
 
-                <!-- Quote Summary -->
                 <div class="bg-white p-6 card-radius shadow-soft">
                     <h2 class="text-2xl font-fredoka font-bold mb-4">Design Summary</h2>
                     
@@ -117,7 +117,6 @@
         </div>
     </main>
 
-    <!-- Modal for Guest Info -->
     <div id="guest-info-modal" class="hidden fixed inset-0 z-[90] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
         <div class="bg-white p-8 card-radius shadow-soft w-full max-w-md">
             <h2 class="text-2xl font-fredoka font-bold text-center mb-4">Almost there!</h2>
@@ -157,7 +156,8 @@
             const guestForm = document.getElementById('guest-info-form');
             const cancelBtn = document.getElementById('cancel-quote-btn');
             
-            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const csrfTokenEl = document.querySelector('meta[name="csrf-token"]');
+            const csrfToken = csrfTokenEl ? csrfTokenEl.getAttribute('content') : null;
             const submitUrl = '{{ route("customize.submit") }}';
 
             function createSlots() {
@@ -198,6 +198,7 @@
                 });
             });
 
+            //REPLACED FUNCTION
             function onSlotClick(index) {
                 if (!selectedComponent) {
                     clearSlots(index);
@@ -214,9 +215,17 @@
                     return;
                 }
 
-                for (let i = 0; i < selectedComponent.slots; i++) {
+                braceletSlots[index] = {
+                    id: selectedComponent.id,
+                    name: selectedComponent.name,
+                    image: selectedComponent.image,
+                    slots: selectedComponent.slots,
+                    is_primary: true
+                };
+
+                for (let i = 1; i < selectedComponent.slots; i++) {
                     const slotIndex = (index + i) % TOTAL_SLOTS;
-                    braceletSlots[slotIndex] = { id: selectedComponent.id, name: selectedComponent.name, image: selectedComponent.image };
+                    braceletSlots[slotIndex] = { primary_slot: index };
                 }
                 
                 updateVisuals();
@@ -224,28 +233,21 @@
             }
 
             function clearSlots(index) {
-                const component = braceletSlots[index];
-                if (!component) return;
+                let componentData = braceletSlots[index];
+                if (!componentData) return;
 
-                let i = 0;
-                while (i < TOTAL_SLOTS) {
-                    let currentIndex = (index + i) % TOTAL_SLOTS;
-                    if (braceletSlots[currentIndex]?.id == component.id) {
-                        braceletSlots[currentIndex] = null;
-                    } else {
-                        break;
-                    }
-                    i++;
+                let primarySlotIndex = index;
+                if (componentData.primary_slot !== undefined) {
+                    primarySlotIndex = componentData.primary_slot;
+                    componentData = braceletSlots[primarySlotIndex];
                 }
-                i = 1;
-                while (i < TOTAL_SLOTS) {
-                    let currentIndex = (index - i + TOTAL_SLOTS) % TOTAL_SLOTS;
-                    if (braceletSlots[currentIndex]?.id == component.id) {
-                        braceletSlots[currentIndex] = null;
-                    } else {
-                        break;
-                    }
-                    i++;
+                
+                if (!componentData || !componentData.is_primary) return;
+
+                const size = componentData.slots;
+                for (let i = 0; i < size; i++) {
+                    const slotIndex = (primarySlotIndex + i) % TOTAL_SLOTS;
+                    braceletSlots[slotIndex] = null;
                 }
                 
                 updateVisuals();
@@ -277,29 +279,79 @@
             function updateVisuals() {
                 const radius = 180;
                 const center = 200;
+                const baseSize = 48;
                 
                 previewCircle.querySelectorAll('.bracelet-slot').forEach((slot, i) => {
                     const data = braceletSlots[i];
                     
-                    if (data) {
+                    slot.style.display = 'block';
+                    slot.style.zIndex = '1';
+                    slot.classList.remove('filled');
+                    slot.style.backgroundImage = 'none';
+                    
+                    if (data && data.is_primary) {
+                        const size = data.slots;
+                        
                         slot.style.backgroundImage = `url(${data.image})`;
                         slot.classList.add('filled');
-                        slot.style.transform = `rotate(0rad)`; 
+                        slot.style.transform = 'rotate(0rad)';
+                        slot.style.zIndex = '10';
+
+                        if (size > 1) {
+                            
+                            const midAngle = ((i + (size - 1) / 2) / TOTAL_SLOTS) * 2 * Math.PI;
+
+                            const x = center + radius * Math.cos(midAngle);
+                            const y = center + radius * Math.sin(midAngle);
+                            
+                            const newSize = baseSize * (1 + (size - 1) * 0.3);
+                            
+                            slot.style.width = `${newSize}px`;
+                            slot.style.height = `${newSize}px`;
+                            slot.style.margin = `-${newSize / 2}px`;
+                            slot.style.left = `${x}px`;
+                            slot.style.top = `${y}px`;
+                            slot.style.backgroundSize = 'contain';
+
+                        } else {
+                            
+                            slot.style.width = `${baseSize}px`;
+                            slot.style.height = `${baseSize}px`;
+                            slot.style.margin = `-${baseSize / 2}px`;
+                            slot.style.backgroundSize = 'cover';
+                            
+                            const angle = (i / TOTAL_SLOTS) * 2 * Math.PI;
+                            const x = center + radius * Math.cos(angle);
+                            const y = center + radius * Math.sin(angle);
+                            
+                            slot.style.left = `${x}px`;
+                            slot.style.top = `${y}px`;
+                        }
+
+                    } else if (data && data.primary_slot !== undefined) {
+                        slot.style.display = 'none';
+
                     } else {
+                        
+                        slot.style.width = `${baseSize}px`;
+                        slot.style.height = `${baseSize}px`;
+                        slot.style.margin = `-${baseSize / 2}px`;
+                        slot.style.backgroundSize = 'cover';
+                        
                         const angle = (i / TOTAL_SLOTS) * 2 * Math.PI;
                         const x = center + radius * Math.cos(angle);
                         const y = center + radius * Math.sin(angle);
                         
-                        slot.style.backgroundImage = 'none';
-                        slot.classList.remove('filled');
                         slot.style.left = `${x}px`;
                         slot.style.top = `${y}px`;
                         slot.style.transform = `rotate(${angle + Math.PI/2}rad)`;
+                        
                     }
                 });
                 
                 slotsRemainingEl.textContent = TOTAL_SLOTS - (braceletSlots.filter(s => s !== null).length);
             }
+
 
             function updateSummary() {
                 itemsListEl.innerHTML = '';
@@ -307,7 +359,7 @@
                 let i = 0;
                 while (i < TOTAL_SLOTS) {
                     const slot = braceletSlots[i];
-                    if (slot) {
+                    if (slot && slot.is_primary) {
                         const component = ALL_COMPONENTS.find(c => c.id == slot.id);
                         if(component) {
                             componentCounts[component.id] = (componentCounts[component.id] || 0) + 1;
@@ -339,7 +391,7 @@
             });
 
             submitBtn.addEventListener('click', () => {
-                const design = braceletSlots.map(s => s ? s.id : 0);
+                const design = braceletSlots.map(s => (s && s.is_primary) ? s.id : 0);
                 if (design.every(id => id === 0)) {
                     if (typeof showToast === 'function') {
                         showToast('Your bracelet is empty! Add some components first.', 'error');
@@ -358,7 +410,7 @@
 
             guestForm.addEventListener('submit', (e) => {
                 e.preventDefault();
-                const design = braceletSlots.map(s => s ? s.id : 0);
+                const design = braceletSlots.map(s => (s && s.is_primary) ? s.id : 0);
                 const name = document.getElementById('customer_name').value;
                 const email = document.getElementById('customer_email').value;
                 
@@ -368,6 +420,14 @@
             });
 
             function submitDesign(design, name, email) {
+                if (!csrfToken) {
+                    console.error('CSRF token not found!');
+                    if (typeof showToast === 'function') {
+                        showToast('Security token missing. Please refresh the page.', 'error');
+                    }
+                    return;
+                }
+
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'SUBMITTING...';
 

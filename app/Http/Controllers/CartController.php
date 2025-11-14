@@ -189,7 +189,7 @@ class CartController extends Controller
         ]);
 
         // Redirect to the payment page
-        return redirect()->route('payment.show');
+        return redirect()->route('checkout.payment');
     }
 
 

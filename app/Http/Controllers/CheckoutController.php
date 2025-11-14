@@ -14,14 +14,12 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderPlaced;
 use App\Mail\AdminOrderNotification;
-use App\Models\CustomDesign; // <-- 1. ADDED THIS
-use App\Models\Component;    // <-- 2. ADDED THIS
+use App\Models\CustomDesign;
+use App\Models\Component;
 
 class CheckoutController extends Controller
 {
 
-    // 3. ADDED THIS ENTIRE NEW FUNCTION
-    // This function creates the order *before* sending to payment.
     public function createOrderFromDesign(CustomDesign $design)
     {
         // Check if this design belongs to the logged-in user
@@ -38,16 +36,17 @@ class CheckoutController extends Controller
         // Check if an order already exists for this design
         $existingOrder = Order::where('custom_design_id', $design->id)->first();
         if ($existingOrder) {
-            // If an order exists but wasn't paid, just send them to payment
+            // If an order exists, just re-set the session with the SUBTOTAL
             session([
-                'checkout_total' => $existingOrder->total_amount,
+                'checkout_total' => $existingOrder->items->first()->price, // This is the subtotal
                 'checkout_order_id' => $existingOrder->id,
             ]);
             return redirect()->route('checkout.payment');
         }
 
-        $shipping = 10.00; // Your shipping fee
-        $total = $design->final_price + $shipping;
+        $shipping = 49.00;
+        $subtotal = $design->final_price; // This is the subtotal
+        $total_amount = $subtotal + $shipping; // This is the final total
 
         DB::beginTransaction();
         try {
@@ -56,31 +55,18 @@ class CheckoutController extends Controller
                 'user_id' => Auth::id(),
                 'custom_design_id' => $design->id, // Link to the design
                 'order_tracking_id' => 'BB-' . Str::upper(Str::random(8)),
-                'total_amount' => $total,
+                'total_amount' => $total_amount, // Save the FULL total to the order
                 'payment_method' => null, // Not set yet
                 'payment_status' => 'unpaid', // Will be updated on payment page
                 'order_status' => 'pending', // Will be updated on payment page
             ]);
 
-            // 2. Create the Order Item from the design
-            // We need to count the components
-            $componentCounts = array_count_values(array_filter($design->design_data));
-            $components = Component::find(array_keys($componentCounts));
-            $itemDescription = "Custom Bracelet: ";
-            foreach ($components as $component) {
-                $count = $componentCounts[$component->id];
-                $itemDescription .= "{$count}x {$component->name}, ";
-            }
-            $itemDescription = rtrim($itemDescription, ', ');
-            
-            // Create a single order item for this custom design
+            // 2. Create the Order Item
             OrderItem::create([
                 'order_id' => $order->id,
-                'product_id' => null, // No product, it's custom
+                'product_id' => 21, // Linking to "Custom Beaded Bracelet"
                 'quantity' => 1,
-                'price' => $design->final_price,
-                'product_name' => 'Custom Beaded Bracelet', // Store the name
-                'product_description' => $itemDescription, // Store the components
+                'price' => $subtotal, // Save the subtotal as the price
             ]);
 
             // 3. Mark the design as 'complete' so it can't be ordered again
@@ -88,7 +74,7 @@ class CheckoutController extends Controller
 
             // 4. Set session for payment page
             session([
-                'checkout_total' => $total,
+                'checkout_total' => $subtotal, // <-- FIX: Only store the SUBTOTAL
                 'checkout_order_id' => $order->id,
             ]);
 
@@ -107,18 +93,20 @@ class CheckoutController extends Controller
 
     public function showPaymentPage()
     {
-        $total = session('checkout_total', 0);
-        $shipping = 10.00;
-        $subtotal = $total > 0 ? $total - $shipping : 0;
+        $subtotal = session('checkout_total', 0); // <-- FIX: The session value is the subtotal
+        $shipping = ($subtotal > 0) ? 49.00 : 0.00; // <-- FIX: Calculate shipping based on subtotal
+        $total = $subtotal + $shipping; // <-- FIX: Calculate the final total
 
-        if ($total <= 0) {
+        if ($subtotal <= 0) {
             // Check if it's a custom design order that failed
             if(session('checkout_order_id')) {
                  $order = Order::find(session('checkout_order_id'));
                  if($order) {
-                    session(['checkout_total' => $order->total_amount]);
-                    $total = $order->total_amount;
-                    $subtotal = $total > 0 ? $total - $shipping : 0;
+                    // Re-fetch the subtotal from the order item
+                    $subtotal = $order->items->first()->price ?? 0;
+                    $shipping = ($subtotal > 0) ? 49.00 : 0.00;
+                    $total = $subtotal + $shipping;
+                    session(['checkout_total' => $subtotal]); // Re-set the session
                  } else {
                     return redirect()->route('cart')->with('error', 'Your session expired.');
                  }
@@ -136,6 +124,7 @@ class CheckoutController extends Controller
 
     public function process(Request $request)
     {
+        
         if ($request->session()->has('checkout_order_id')) {
             return $this->finalizeCustomOrder($request);
         } else {
@@ -184,6 +173,7 @@ class CheckoutController extends Controller
             $order->load('user', 'items.product');
             
             Mail::to($order->user->email)->send(new OrderPlaced($order));
+            
             Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
 
             session()->forget('checkout_total');
@@ -213,10 +203,10 @@ class CheckoutController extends Controller
         ]);
 
         $itemIdsToCheckout = session('checkout_item_ids', []);
-        $total = session('checkout_total', 0);
+        $subtotal = session('checkout_total', 0); // This is the subtotal
         $cart = Auth::user()->cart;
 
-        if (empty($itemIdsToCheckout) || $total <= 0 || !$cart) {
+        if (empty($itemIdsToCheckout) || $subtotal <= 0 || !$cart) {
             return redirect()->route('cart')->with('error', 'Your session expired or your cart is empty. Please try again.');
         }
 
@@ -230,6 +220,13 @@ class CheckoutController extends Controller
         }
 
         $paymentStatus = ($validated['payment_method'] === 'cod') ? 'unpaid' : 'pending';
+        $shipping = ($subtotal > 0) ? 49.00 : 0.00;
+        $total_amount = $subtotal + $shipping;
+
+        // Validate that the total_amount from the form matches the calculated total
+        if (abs(floatval($validated['total_amount']) - $total_amount) > 0.01) {
+            return redirect()->back()->with('error', 'Total amount mismatch. Please try again.');
+        }
 
         DB::beginTransaction();
 
@@ -242,7 +239,7 @@ class CheckoutController extends Controller
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'order_tracking_id' => 'BB-' . Str::upper(Str::random(8)),
-                'total_amount' => $total,
+                'total_amount' => $total_amount, // Save the FULL total
                 'payment_method' => $validated['payment_method'],
                 'payment_status' => $paymentStatus,
                 'order_status' => 'pending',
@@ -264,7 +261,7 @@ class CheckoutController extends Controller
                     'product_id' => $item->product_id,
                     'quantity' => $item->quantity,
                     'price' => $item->product->price,
-                    'product_name' => $item->product->name, // Store current name
+                    // 'product_name' => $item->product->name, 
                 ]);
                 $item->product->decrement('stock', $item->quantity);
                 $item->delete(); 
@@ -275,6 +272,7 @@ class CheckoutController extends Controller
             $order->load('user', 'items.product');
             
             Mail::to($order->user->email)->send(new OrderPlaced($order));
+            
             Mail::to('reginetuba35@gmail.com')->send(new AdminOrderNotification($order));
 
             session()->forget('checkout_total');

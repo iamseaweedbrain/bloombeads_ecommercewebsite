@@ -1,9 +1,8 @@
 <x-layout>
-    {{-- 1. ADDED STYLES for the bracelet preview --}}
     <style>
         .bracelet-preview-container {
             position: relative;
-            width: 350px; /* A bit smaller for the modal */
+            width: 350px;
             height: 350px;
             margin: 1rem auto;
         }
@@ -11,9 +10,9 @@
             position: absolute;
             left: 50%;
             top: 50%;
-            width: 30px;  /* A bit smaller for the modal */
+            width: 30px; 
             height: 30px;
-            margin: -15px; /* Half of the width/height */
+            margin: -15px;
             border-radius: 50%;
             background-color: #f0f0f0;
             border: 2px dashed #d1d5db;
@@ -104,15 +103,13 @@
                                         <p class="font-poppins font-bold text-xl text-sakura">₱{{ number_format($design->final_price, 2) }}</p>
                                         
                                         {{-- 3. FIXED "Accept & Pay" BUG --}}
-                                        {{-- This is now a simple link to your checkout page. --}}
-                                        {{-- You must create this route: route('checkout.design', $design) --}}
-                                        {{-- This route should be a GET route that SHOWS the checkout page. --}}
-                                       <form action="{{ route('checkout.createFromDesign', $design) }}" method="POST" class="mt-2">
-                                        @csrf
-                                        <button type="submit" class="inline-block py-2 px-5 font-poppins font-semibold card-radius text-white bg-cta hover:bg-opacity-80 transition-default">
-                                            Accept & Pay
-                                        </button>
-                                    </form> 
+                                        {{-- This now points to your CheckoutController to create the order FIRST --}}
+                                        <form action="{{ route('checkout.createFromDesign', $design) }}" method="POST" class="mt-2">
+                                            @csrf
+                                            <button type="submit" class="inline-block py-2 px-5 font-poppins font-semibold card-radius text-white bg-cta hover:bg-opacity-80 transition-default">
+                                                Accept & Pay
+                                            </button>
+                                        </form>
                                     @endif
                                 </div>
                             </div>
@@ -202,6 +199,8 @@
                                 <div class="p-4 space-y-4">
                                     @foreach ($order->items as $item)
                                         <div class="flex items-center space-x-4">
+                                            {{-- This is your original, unchanged code as requested. --}}
+                                            {{-- NOTE: This will crash if product_id is null. --}}
                                             <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}"
                                                  alt="{{ $item->product->name }}"
                                                  class="w-16 h-16 card-radius object-cover bg-gray-100 flex-shrink-0">
@@ -258,7 +257,7 @@
     <script>
         {{-- 5. ADDED JAVASCRIPT LOGIC --}}
 
-        // Assumes your controller passes $allComponents to this view
+        // This gets the component data from the controller
         const ALL_COMPONENTS = @json($allComponents ?? []); 
         const TOTAL_SLOTS = 50;
 
@@ -292,7 +291,6 @@
                 if (component) {
                     const size = component.slot_size || 1;
                     
-                    // Use the full_image_url from the Component model
                     slot.style.backgroundImage = `url(${component.full_image_url})`; 
                     slot.classList.add('filled');
                     slot.style.zIndex = '10';
@@ -348,30 +346,28 @@
             setTimeout(() => modal.classList.add('hidden'), 300);
         }
 
-        // --- Existing Tab Logic ---
+        // --- Your Existing Tab Logic ---
         function setDashboardTab(tabId) {
-            // Hide all content panes
             document.getElementById('dashboard-user-info-content').classList.add('hidden');
             document.getElementById('dashboard-activity-content').classList.add('hidden');
             document.getElementById('dashboard-orders-content').classList.add('hidden');
             document.getElementById('dashboard-designs-content').classList.add('hidden'); 
             
-            // Show the selected one
             const contentEl = document.getElementById('dashboard-' + tabId + '-content');
             if (contentEl) {
                 contentEl.classList.remove('hidden');
             }
 
-            // Update tab button styles
             document.querySelectorAll('.dashboard-tab-btn').forEach(btn => {
                 if (!btn.closest('form')) {
                     btn.classList.remove('bg-sakura', 'text-white');
-                    // We don't need to add bg-neutral, it should be the default
+                    btn.classList.add('bg-neutral', 'text-dark');
                 }
             });
             
             const activeBtn = document.getElementById('tab-btn-' + tabId);
             if (activeBtn) {
+                activeBtn.classList.remove('bg-neutral', 'text-dark');
                 activeBtn.classList.add('bg-sakura', 'text-white');
             }
         }

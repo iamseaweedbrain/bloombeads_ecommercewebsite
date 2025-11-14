@@ -364,9 +364,24 @@
 
             submitBtn.addEventListener('click', () => {
                 const design = braceletSlots.map(s => (s && s.is_primary) ? s.id : 0);
+                
+                // Check 1: Is the bracelet completely empty?
                 if (design.every(id => id === 0)) {
                     if (typeof showToast === 'function') {
                         showToast('Your bracelet is empty! Add some components first.', 'error');
+                    }
+                    return;
+                }
+
+                // Check 2: Is the bracelet full?
+                const filledSlots = braceletSlots.filter(s => s !== null).length;
+                if (filledSlots < TOTAL_SLOTS) {
+                    const remaining = TOTAL_SLOTS - filledSlots;
+                    const slotText = remaining === 1 ? 'slot' : 'slots';
+                    if (typeof showToast === 'function') {
+                        showToast(`Your bracelet is not full. You still have ${remaining} ${slotText} remaining.`, 'error');
+                    } else {
+                        alert(`Your bracelet is not full. You still have ${remaining} ${slotText} remaining.`);
                     }
                     return;
                 }

@@ -3,7 +3,7 @@
 @section('content')
 <section id="notification-details-view" class="font-poppins">
     
-    <a href="{{ route('admin.notifications') }}" class="flex items-center text-sky hover:text-opacity-80 font-fredoka font-semibold mb-4">
+    <a href="{{ route('admin.notifications') }}" class="flex items-center text-dark hover:text-sakura font-fredoka font-semibold mb-4">
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
         Back to Notifications
     </a>

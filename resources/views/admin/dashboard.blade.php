@@ -21,7 +21,7 @@
             <p class="font-poppins text-xs text-dark/70 mt-1">Orders with 'pending' status</p>
         </div>
 
-        <div class_name="bg-white p-6 card-radius shadow-soft border border-neutral/50">
+        <div class="bg-white p-6 card-radius shadow-soft border border-neutral/50">
             <h4 class="font-poppins text-sm text-dark/70">Pending Approvals</h4>
             <p class="text-3xl font-fredoka font-bold text-cta mt-2">
                 {{ $pendingApprovals }}
@@ -29,7 +29,7 @@
             <p class="font-poppins text-xs text-dark/70 mt-1">Custom designs awaiting quote</p>
         </div>
 
-        <div class_name="bg-white p-6 card-radius shadow-soft border border-neutral/50">
+        <div class="bg-white p-6 card-radius shadow-soft border border-neutral/50">
             <h4 class="font-poppins text-sm text-dark/70">Total Users</h4>
             <p class="text-3xl font-fredoka font-bold text-green-600 mt-2">
                 {{ $totalUsers }}

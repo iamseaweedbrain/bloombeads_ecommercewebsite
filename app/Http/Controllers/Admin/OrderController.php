@@ -45,12 +45,14 @@ class OrderController extends Controller
         $request->validate([
             'payment_status' => 'required|in:pending,paid,unpaid,failed',
             'order_status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+            'tracking_number'=> 'required|string|max:255',
         ]);
 
         $newPaymentStatus = $request->payment_status;
         $newOrderStatus = $request->order_status;
         $oldStatus = $order->order_status;
         $paymentMethod = $order->payment_method;
+        $trackingNumber = $request->tracking_number;
 
         // --- Validation Logic ---
         if (
@@ -75,9 +77,13 @@ class OrderController extends Controller
             }
         }
 
+        //para sa trakcing id
+        $trackingId = "https://www.jtexpress.ph/index/query/gzquery.html?no=" . $trackingNumber;
+
         // Update the order
         $order->payment_status = $newPaymentStatus;
         $order->order_status = $newOrderStatus;
+        $order->tracking_id = $trackingId;
         $order->save();
 
         // --- vvv 3. SEND "ORDER SHIPPED" EMAIL vvv ---

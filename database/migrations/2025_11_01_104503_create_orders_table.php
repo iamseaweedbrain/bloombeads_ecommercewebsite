@@ -19,6 +19,7 @@ return new class extends Migration
             
             // Your unique tracking ID (e.g., BB-1234ABCD)
             $table->string('order_tracking_id')->unique();
+            $table->string('tracking_id')->nullable();
             
             // Customer & Shipping Info (Add any other fields you need)
             // $table->string('customer_name');

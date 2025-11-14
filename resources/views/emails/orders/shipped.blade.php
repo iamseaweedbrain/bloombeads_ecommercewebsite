@@ -29,8 +29,8 @@
 
             <div class="tracking-info">
                 <p class="label">You can track your package with this ID:</p>
-                <p class="code">J&T-{{ $order->order_tracking_id }}</p>
-                <p class="label" style="margin-top: 15px;">(Note: This is a placeholder. We will add a real tracking link here later.)</p>
+                <p class="code">ORDER-{{ $order->order_tracking_id }}</p>
+                <a href="{{ $order->tracking_id }}" class="label" style="margin-top: 15px;">Track your order with your J&T tracking link.</a>
             </div>
 
             <p style="text-align: center; margin: 30px 0;">

@@ -166,10 +166,18 @@
                                 <option value="cancelled" @selected($order->order_status == 'cancelled')>Cancelled</option>
                             </select>
                         </div>
+
+                        <div class="hidden" id="tracking_input">
+                            <label for="tracking_number" class="block font-semibold mb-2">Enter the J&T Tracking ID</label>
+                            <input type="text" name="tracking_number" id="tracking_number" 
+                                placeholder="e.g. 800123456789"
+                                class="w-full p-2 card-radius border border-gray-300 focus:ring-sakura" value="{{ $order->tracking_id ?? '' }}" required>
+                        </div>
                     </div>
                     
                     <div class="text-right mt-6">
-                        <button type="submit" class="bg-cta text-white font-fredoka font-bold py-2 px-6 card-radius shadow-soft hover:bg-opacity-90">
+                        <button type="submit"
+                            class="bg-cta text-white font-fredoka font-bold py-2 px-6 card-radius shadow-soft hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed">
                             Update Order
                         </button>
                     </div>
@@ -201,54 +209,79 @@
 </section>
 
 @push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const paymentStatusEl = document.getElementById('payment_status');
-        const orderStatusEl = document.getElementById('order_status');
-        const form = paymentStatusEl.closest('form');
-        const paymentMethod = form.dataset.paymentMethod;
-        
-        if (!paymentStatusEl || !orderStatusEl || !form) return;
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const paymentStatusEl = document.getElementById('payment_status');
+            const orderStatusEl = document.getElementById('order_status');
 
-        const processingStatuses = ['processing', 'shipped', 'delivered'];
-        const orderOptions = orderStatusEl.querySelectorAll('option');
+            if (!paymentStatusEl || !orderStatusEl) return;
 
-        function syncOrderOptions() {
-            let currentPayment = paymentStatusEl.value;
-            let currentOrder = orderStatusEl.value;
+            const form = orderStatusEl.closest('form');
+            if (!form) return;
 
-            orderOptions.forEach(option => {
-                option.disabled = false;
-                option.style.color = '#000';
-            });
+            const paymentMethod = form.dataset.paymentMethod;
+            const updateBtn = form.querySelector('button[type="submit"]');
 
-            if (currentPayment === 'failed') {
+            if (orderStatusEl.value === 'delivered') {
+                updateBtn.disabled = true;
+                updateBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            function showTrackingInput() {
+                const track = document.getElementById('tracking_input');
+                if (!track) return;
+
+                if (orderStatusEl.value === 'shipped') {
+                    track.classList.remove('hidden');
+                } else {
+                    track.classList.add('hidden');
+                }
+            }
+            showTrackingInput();
+            orderStatusEl.addEventListener('change', showTrackingInput);
+
+            const processingStatuses = ['processing', 'shipped', 'delivered'];
+            const orderOptions = orderStatusEl.querySelectorAll('option');
+
+            function syncOrderOptions() {
+                let currentPayment = paymentStatusEl.value;
+                let currentOrder = orderStatusEl.value;
+
                 orderOptions.forEach(option => {
-                    if (option.value !== 'cancelled') {
-                        option.disabled = true;
-                        option.style.color = '#999';
-                    }
+                    option.disabled = false;
+                    option.style.color = '#000';
                 });
-                orderStatusEl.value = 'cancelled';
-                
-            } else if (paymentMethod === 'gcash' || paymentMethod === 'maya') {
-                if (currentPayment !== 'paid') {
+
+                if (currentPayment === 'failed') {
                     orderOptions.forEach(option => {
-                        if (processingStatuses.includes(option.value)) {
+                        if (option.value !== 'cancelled') {
                             option.disabled = true;
                             option.style.color = '#999';
                         }
                     });
-                    if (processingStatuses.includes(currentOrder)) {
-                        orderStatusEl.value = 'pending';
+                    orderStatusEl.value = 'cancelled';
+
+                } else if (paymentMethod === 'gcash' || paymentMethod === 'maya') {
+                    if (currentPayment !== 'paid') {
+                        orderOptions.forEach(option => {
+                            if (processingStatuses.includes(option.value)) {
+                                option.disabled = true;
+                                option.style.color = '#999';
+                            }
+                        });
+
+                        if (processingStatuses.includes(currentOrder)) {
+                            orderStatusEl.value = 'pending';
+                        }
                     }
                 }
             }
-        }
-        paymentStatusEl.addEventListener('change', syncOrderOptions);
-        orderStatusEl.addEventListener('change', syncOrderOptions);
-        syncOrderOptions();
-    });
-</script>
+
+            paymentStatusEl.addEventListener('change', syncOrderOptions);
+            orderStatusEl.addEventListener('change', syncOrderOptions);
+
+            syncOrderOptions();
+        });
+    </script>
 @endpush
 @endsection

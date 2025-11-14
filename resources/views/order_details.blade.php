@@ -39,31 +39,44 @@
                 <div class="space-y-4 py-6 border-b border-neutral">
                     @foreach($order->items as $item)
                         <div class="flex items-center space-x-4">
-                            <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}"
-                                 alt="{{ $item->product->name }}"
-                                 class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
-                            <div class="flex-grow">
-                                <p class="font-poppins font-semibold text-dark">{{ $item->product->name }}</p>
-                                <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
-                            </div>
+                            
+                            @if ($item->product)
+                                {{-- Case 1: It's a regular catalog product --}}
+                                <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}"
+                                     alt="{{ $item->product->name }}"
+                                     class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
+                                <div class="flex-grow">
+                                    <p class="font-poppins font-semibold text-dark">{{ $item->product->name }}</p>
+                                    <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
+                                </div>
+                            @else
+                                {{-- Case 2: It's a custom design (product_id is null) --}}
+                                <img src="https://placehold.co/80x80/FFB347/FFFFFF?text=Custom"
+                                     alt="{{ $item->product_name ?? 'Custom Item' }}"
+                                     class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
+                                <div class="flex-grow">
+                                    <p class="font-poppins font-semibold text-dark">{{ $item->product_name ?? 'Custom Bracelet' }}</p>
+                                    <p class="text-xs text-dark/70 truncate" style="max-width: 200px;">
+                                        {{ $item->product_description }}
+                                    </p>
+                                    <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
+                                </div>
+                            @endif
+
                             <p class="font-poppins font-semibold text-dark text-lg">₱{{ number_format($item->price * $item->quantity, 2) }}</p>
                         </div>
                     @endforeach
                 </div>
 
-                @if(in_array($order->order_status, ['pending', 'processing']))
-                <div class="border-t border-neutral mt-6 pt-6 text-right">
-                    <form action="{{ route('order.cancel', $order) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
-                        @csrf
-                        <button type-="submit" class="py-2 px-6 font-poppins font-semibold card-radius text-white bg-red-500 hover:bg-red-600 transition-default">
-                            Cancel Order
-                        </button>
-                    </form>
-                </div>
-                @endif
-                </div>
-
+                {{-- 
+                THIS SECTION IS NOW INSIDE THE CARD
+                I also fixed the hardcoded shipping/subtotal
+                --}}
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
+                    @php
+                        $shipping = 49.00; // This should match your CheckoutController
+                        $subtotal = $order->total_amount - $shipping;
+                    @endphp
                     
                     @if($order->payment_method == 'cod')
                         <div>
@@ -79,11 +92,11 @@
                             <h3 class="text-xl font-fredoka font-bold mb-3">Order Summary</h3>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Subtotal:</span>
-                                <span>₱{{ number_format($order->total_amount - 10, 2) }}</span>
+                                <span>₱{{ number_format($subtotal, 2) }}</span>
                             </div>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Shipping:</span>
-                                <span>₱10.00</span>
+                                <span>₱{{ number_format($shipping, 2) }}</span>
                             </div>
                             <div class="flex justify-between font-fredoka font-bold text-lg pt-2 border-t border-neutral">
                                 <span class="text-dark">Total:</span>
@@ -109,11 +122,11 @@
                                 <h3 class="text-xl font-fredoka font-bold mb-3">Order Summary</h3>
                                 <div class="flex justify-between font-poppins">
                                     <span class="text-dark/70">Subtotal:</span>
-                                    <span>₱{{ number_format($order->total_amount - 10, 2) }}</span>
+                                    <span>₱{{ number_format($subtotal, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between font-poppins">
                                     <span class="text-dark/70">Shipping:</span>
-                                    <span>₱10.00</span>
+                                    <span>₱{{ number_format($shipping, 2) }}</span>
                                 </div>
                                 <div class="flex justify-between font-fredoka font-bold text-lg pt-2 border-t border-neutral">
                                     <span class="text-dark">Total:</span>
@@ -140,10 +153,22 @@
                             @endif
                         </div>
                     @endif
-
                 </div>
+
+                {{-- This is now the last item in the card --}}
+                @if(in_array($order->order_status, ['pending', 'processing']))
+                <div class="border-t border-neutral mt-0 pt-6 text-right"> {{-- Removed mt-6 --}}
+                    <form action="{{ route('order.cancel', $order) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
+                        @csrf
+                        <button type="submit" class="py-2 px-6 font-poppins font-semibold card-radius text-white bg-red-500 hover:bg-red-600 transition-default">
+                            Cancel Order
+                        </button>
+                    </form>
+                </div>
+                @endif
             </div>
 
+            {{-- This is the hidden div for the PDF download --}}
             <div class="absolute -left-[9999px]">
                 <div class=" bg-white p-28 card-radius shadow-soft" id="orderReceipt">
                     <div class="flex flex-col sm:flex-row justify-between sm:items-center border-b border-neutral pb-4">
@@ -171,13 +196,24 @@
                     <div class="space-y-4 py-6 border-b border-neutral">
                         @foreach($order->items as $item)
                             <div class="flex items-center space-x-4">
-                                <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}"
-                                    alt="{{ $item->product->name }}"
-                                    class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
-                                <div class="flex-grow">
-                                    <p class="font-poppins font-semibold text-dark">{{ $item->product->name }}</p>
-                                    <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
-                                </div>
+                                @if ($item->product)
+                                    <img src="{{ $item->product->image_path ? asset('storage/' . $item->product->image_path) : 'https://placehold.co/80x80/FF6B81/FFFFFF?text=B' }}"
+                                         alt="{{ $item->product->name }}"
+                                         class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
+                                    <div class="flex-grow">
+                                        <p class="font-poppins font-semibold text-dark">{{ $item->product->name }}</p>
+                                        <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
+                                    </div>
+                                @else
+                                    <img src="https://placehold.co/80x80/FFB347/FFFFFF?text=Custom"
+                                         alt="{{ $item->product_name ?? 'Custom Item' }}"
+                                         class="w-20 h-20 card-radius object-cover bg-gray-100 flex-shrink-0">
+                                    <div class="flex-grow">
+                                        <p class="font-poppins font-semibold text-dark">{{ $item->product_name ?? 'Custom Bracelet' }}</p>
+                                        <p class="text-xs text-dark/70">{{ $item->product_description }}</p>
+                                        <p class="text-sm text-dark/70">x {{ $item->quantity }}</p>
+                                    </div>
+                                @endif
                                 <p class="font-poppins font-semibold text-dark text-lg">₱{{ number_format($item->price * $item->quantity, 2) }}</p>
                             </div>
                         @endforeach
@@ -197,11 +233,11 @@
                             <h3 class="text-xl font-fredoka font-bold mb-3">Order Summary</h3>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Subtotal:</span>
-                                <span>₱{{ number_format($order->total_amount - 10, 2) }}</span>
+                                <span>₱{{ number_format($subtotal, 2) }}</span>
                             </div>
                             <div class="flex justify-between font-poppins">
                                 <span class="text-dark/70">Shipping:</span>
-                                <span>₱10.00</span>
+                                <span>₱{{ number_format($shipping, 2) }}</span>
                             </div>
                             <div class="flex justify-between font-fredoka font-bold text-lg pt-2 border-t border-neutral">
                                 <span class="text-dark">Total:</span>
@@ -219,7 +255,7 @@
                                 @if($order->payment_receipt_path)
                                     <a href="{{ asset('storage/' . $order->payment_receipt_path) }}" target="_blank" title="View full receipt">
                                         <img src="{{ asset('storage/'. $order->payment_receipt_path) }}" alt="Payment Receipt" 
-                                            class="w-full card-radius border border-neutral hover:border-sky transition-all object-cover max-h-96">
+                                             class="w-full card-radius border border-neutral hover:border-sky transition-all object-cover max-h-96">
                                     </a>
                                 @else
                                     <p class="font-poppins text-sm text-dark/70">
@@ -258,5 +294,5 @@
 
             btn.classList.remove('animate-bounce');
         }
-        </script>
+    </script>
 </x-layout>

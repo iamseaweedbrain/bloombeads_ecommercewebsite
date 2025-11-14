@@ -58,44 +58,56 @@
 
                 <div id="settings-password-content" class="hidden">
                     <h3 class="text-2xl font-fredoka font-bold text-dark mb-4 border-b pb-2 border-sakura">Change Password</h3>
-                    <form action="{{ route('password.update') }}" method="POST" class="space-y-4 font-poppins max-w-sm">
-                        @csrf
-                        
-                        <div class="relative">
-                            <input type="password" name="current_password" id="current_password" placeholder="Current Password" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150 pr-10">
-                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('current_password')">
+                    <form action="{{ route('password.update') }}" method="POST" class="space-y-4 font-poppins max-w-lg">
+                    @csrf
+
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <input type="password" name="current_password" id="current_password"
+                                placeholder="Current Password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150 pr-10">
+                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility('current_password')">
                                 <i class="far fa-eye" id="toggle-current_password"></i>
                             </span>
-                            @error('current_password') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
                         </div>
-                        
-                        <div class="relative">
-                            <input type="password" name="new_password" id="new_password_input" placeholder="New Password" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150 pr-10"
-                                   oninput="validateNewPasswordInput()">
-                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('new_password_input')">
+                        @error('current_password') 
+                            <span class="text-red-500 text-sm whitespace-nowrap">{{ $message }}</span> 
+                        @enderror
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <input type="password" name="new_password" id="new_password_input"
+                                placeholder="New Password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150 pr-10"
+                                oninput="validateNewPasswordInput()">
+                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility('new_password_input')">
                                 <i class="far fa-eye" id="toggle-new_password_input"></i>
                             </span>
-                            @error('new_password') 
-                                <p class="text-red-500 text-sm mt-1">{{ $message }}</p> 
-                            @enderror
-                            <div id="new-password-requirements" class="text-sm mt-1 text-gray-500"></div>
                         </div>
+                        @error('new_password') 
+                            <span class="text-red-500 text-sm whitespace-nowrap">{{ $message }}</span> 
+                        @enderror
+                    </div>
 
-                        <div class="relative">
-                            <input type="password" name="new_password_confirmation" id="new_password_confirmation_input" placeholder="Confirm New Password" required
-                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150 pr-10"
-                                   oninput="validateNewPasswordInput()">
-                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer" onclick="togglePasswordVisibility('new_password_confirmation_input')">
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <input type="password" name="new_password_confirmation" id="new_password_confirmation_input"
+                                placeholder="Confirm New Password" required
+                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky transition-colors duration-150 pr-10"
+                                oninput="validateNewPasswordInput()">
+                            <span class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer" onclick="togglePasswordVisibility('new_password_confirmation_input')">
                                 <i class="far fa-eye" id="toggle-new_password_confirmation_input"></i>
                             </span>
                         </div>
+                    </div>
 
-                        <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
-                            UPDATE PASSWORD
-                        </button>
-                    </form>
+                    <div id="new-password-requirements" class="text-sm mt-1 text-gray-500"></div>
+
+                    <button type="submit" class="w-full py-3 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
+                        UPDATE PASSWORD
+                    </button>
+                </form>
                 </div>
             </div>
         </div>

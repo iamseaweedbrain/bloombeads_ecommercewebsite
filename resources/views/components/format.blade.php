@@ -6,6 +6,7 @@
             <meta name="csrf-token" content="{{ csrf_token() }}">
 
             <title>{{ $title ?? 'Bloombeads by Jinx' }}</title>
+            <link rel="icon" type="image/png" href="{{ asset('bloombeadslogo.png') }}">
 
             {{-- Tailwind + Fonts --}}
             <script src="https://cdn.tailwindcss.com"></script>

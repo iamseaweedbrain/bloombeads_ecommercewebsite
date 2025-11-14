@@ -11,23 +11,20 @@ class ProductController extends Controller
 {
     public function edit(Product $product)
     {
-        // Return product data as JSON for the JavaScript function
         return response()->json($product);
     }
 
-    /**
-     * Update the specified product in storage.
-     */
     public function update(Request $request, Product $product)
     {
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category' => 'required|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
-
+        $validatedData['description'] = $request->description;
         if ($request->hasFile('image')) {
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
@@ -51,14 +48,11 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
-            // Delete the associated image file first
             if ($product->image_path) {
                 Storage::disk('public')->delete($product->image_path);
             }
-            // Delete the product record
             $product->delete();
         } catch (\Exception $e) {
-             // Log the error $e->getMessage()
              return redirect()->back()->with('error', 'Failed to delete product. Please try again.');
         }
 
@@ -66,29 +60,22 @@ class ProductController extends Controller
         return redirect()->route('admin.catalog.index')->with('success', 'Product deleted successfully!');
     }
 
-    /**
-     */
     public function index()
     {
-        // Get all products from the database, ordered by newest first
         $products = Product::latest()->get(); 
 
-        // Send the $products variable to the admin.catalog view
         return view('admin.catalog', ['products' => $products]);
     }
-
-    /**
-     * Store a new product in the database.
-     */
     public function store(Request $request)
     {
         //Validate the incoming data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category' => 'required|string',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // 2MB max
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         //Handle the file upload
@@ -102,7 +89,6 @@ class ProductController extends Controller
         }
 
 
-        //Create the product in the database
         unset($validatedData['image']); 
         
         try {

@@ -144,7 +144,7 @@
                 subtotal += price * qty;
             });
 
-            const shipping = checkedItemCount > 0 ? 10.00 : 0.00;
+            const shipping = checkedItemCount > 0 ? 49.00 : 0.00;
             const total = subtotal + shipping;
 
             document.querySelector('.subtotal').textContent = '₱' + subtotal.toFixed(2);

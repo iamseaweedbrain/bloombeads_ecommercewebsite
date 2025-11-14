@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\ComponentController;
 use App\Http\Controllers\ForgotPasswordOtpController;
 use App\Http\Controllers\SupportMessageController;
 use App\Http\Controllers\DashboardController;
@@ -85,6 +86,13 @@ Route::middleware('session.user')->prefix('admin')->name('admin.')->group(functi
     Route::get('/catalog/{product}/edit', [AdminProductController::class, 'edit'])->name('catalog.edit');
     Route::put('/catalog/{product}', [AdminProductController::class, 'update'])->name('catalog.update');
     Route::delete('/catalog/{product}', [AdminProductController::class, 'destroy'])->name('catalog.destroy');
+
+    //Components for Design yours
+    Route::get('/components', [ComponentController::class, 'index'])->name('components.index');
+    Route::post('/components', [ComponentController::class, 'store'])->name('components.store');
+    Route::get('/components/{component}/edit', [ComponentController::class, 'edit'])->name('components.edit');
+    Route::put('/components/{component}', [ComponentController::class, 'update'])->name('components.update');
+    Route::delete('/components/{component}', [ComponentController::class, 'destroy'])->name('components.destroy');
 
     // --- TRANSACTION/ORDER ROUTES ---
     Route::get('/transactions', [AdminOrderController::class, 'index'])->name('transactions');

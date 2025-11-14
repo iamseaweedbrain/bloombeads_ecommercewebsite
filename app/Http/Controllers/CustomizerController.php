@@ -47,7 +47,7 @@ class CustomizerController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Your design has been submitted! We will email you with a quote shortly.'
+            'message' => 'Your design has been submitted! You can check the status in your dashboard.'
         ]);
     }
 

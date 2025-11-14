@@ -4,7 +4,7 @@
 <section id="catalog-view">
     <div class="flex justify-between items-center mb-6">
         <h2 class="text-3xl font-fredoka font-bold">Catalog Management</h2>
-        <button onclick="openModal('productModal')" class="py-2 px-5 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
+        <button onclick="openModal()" class="py-2 px-5 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">
             Add New Product
         </button>
     </div>
@@ -14,8 +14,7 @@
             {{ session('success') }}
         </div>
     @endif
-    <div class="bg-white card-radius shadow-soft overflow-hidden">
-
+    
     <div class="bg-white card-radius shadow-soft overflow-hidden">
         <div class="overflow-x-auto custom-scrollbar">
             <table>
@@ -56,7 +55,7 @@
                         <td colspan="6" class="text-center text-gray-500 py-4">No products found. Add one to get started!</td>
                     </tr>
                     @endforelse
-                    </tbody>
+                </tbody>
             </table>
         </div>
     </div>

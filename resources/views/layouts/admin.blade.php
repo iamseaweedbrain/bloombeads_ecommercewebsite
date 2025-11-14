@@ -55,6 +55,10 @@
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span>Catalog Management</span>
                 </a>
+                <a href="{{ route('admin.components.index') }}" id="nav-components" class="admin-nav-link w-full {{ request()->routeIs('admin.components.index') ? 'active' : '' }}">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Component Management</span>
+                </a>
                 <a href="{{ route('admin.transactions') }}" id="nav-transactions" class="admin-nav-link w-full {{ request()->routeIs('admin.transactions*') ? 'active' : '' }}">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
                     <span>Transactions</span>
@@ -98,26 +102,30 @@
             </header>
 
             <main class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-8">
-
                 @yield('content')
-
             </main>
         </div>
     </div>
 
+    {{-- PRODUCT MODAL --}}
     <div id="productModal" class="modal-overlay">
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-4">
-                <h3 id="modalTitle" class="text-2xl font-fredoka font-bold text-sakura">Add New Product</h3>
+                <h3 id="product-modalTitle" class="text-2xl font-fredoka font-bold text-sakura">Add New Product</h3>
                 <button onclick="closeModal()" class="text-dark hover:text-sakura text-3xl font-bold">&times;</button>
             </div>
             <form id="productForm" action="" method="POST" enctype="multipart/form-data" class="space-y-4">
                 @csrf
-                <input type="hidden" name="_method" id="formMethod" value="POST">
+                <input type="hidden" name="_method" id="product-formMethod" value="POST">
 
                 <div>
                     <label for="productName" class="form-label">Product Name</label>
                     <input type="text" id="productName" name="name" class="form-input" placeholder="e.g., Sakura Blossom Bracelet" required>
+                </div>
+                
+                <div>
+                    <label for="productDescription" class="form-label">Description</label>
+                    <textarea id="productDescription" name="description" class="form-textarea" rows="3" placeholder="Enter product description..."></textarea>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -140,13 +148,13 @@
                     </select>
                 </div>
                 <div>
-                    <label for="productImage" class="form-label" id="imageLabel">Product Image</label>
+                    <label for="productImage" class="form-label" id="product-imageLabel">Product Image</label>
                     <input type="file" id="productImage" name="image" class="form-input" accept="image/png, image/jpeg">
-                    <span id="currentImage" class="text-xs text-gray-500 mt-1 block"></span>
+                    <span id="product-currentImage" class="text-xs text-gray-500 mt-1 block"></span>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-neutral">
                     <button type="button" onclick="closeModal()" class="py-2 px-5 font-poppins font-semibold card-radius text-dark bg-neutral hover:bg-gray-200 transition-default">Cancel</button>
-                    <button type="submit" id="saveButton" class="py-2 px-5 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">Save Product</button>
+                    <button type="submit" id="product-saveButton" class="py-2 px-5 font-fredoka font-bold card-radius text-white bg-cta hover:bg-opacity-90 transition-default shadow-soft">Save Product</button>
                 </div>
             </form>
         </div>

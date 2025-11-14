@@ -46,7 +46,7 @@ class ProductSeeder extends Seeder
                 'stock' => rand(5, 30),
                 'category' => $product['category'],
                 'description' => $product['name'] . ' — a limited edition JJK-inspired bag charm.',
-                'image_path' => 'product/' . $product['file'],
+                'image_path' => 'products/' . $product['file'],
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);

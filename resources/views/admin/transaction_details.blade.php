@@ -169,7 +169,9 @@
                     </div>
                     
                     <div class="text-right mt-6">
-                        <button type="submit" class="bg-cta text-white font-fredoka font-bold py-2 px-6 card-radius shadow-soft hover:bg-opacity-90">
+                        <button type="submit"
+                            class="bg-cta text-white font-fredoka font-bold py-2 px-6 card-radius shadow-soft hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                            @disabled($order->order_status == 'delivered')>
                             Update Order
                         </button>
                     </div>

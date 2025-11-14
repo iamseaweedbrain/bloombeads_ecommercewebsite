@@ -13,7 +13,7 @@ class UserAccountSeeder extends Seeder
     {
         DB::table('useraccount')->insert([
             'fullName' => 'Test User',
-            'email' => 'test@example.com',
+            'email' => 'test@gmail.com',
             'password' => Hash::make('password123'),
             'contact_number' => '09123456789',
             'address' => '123 Sample Street, Makati City',

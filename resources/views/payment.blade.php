@@ -1,10 +1,4 @@
 <x-layout>
-    @php
-        $total = session('checkout_total', 0);
-        $shipping = 10.00;
-        $subtotal = $total > 0 ? $total - $shipping : 0; 
-    @endphp
-
     <section class="px-6 py-12 bg-neutral min-h-screen">
         <main class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
 

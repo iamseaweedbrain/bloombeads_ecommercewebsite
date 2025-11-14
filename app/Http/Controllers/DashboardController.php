@@ -8,7 +8,7 @@ use App\Models\Order;
 use App\Models\CustomDesign;
 use App\Models\UserActivity;
 use Illuminate\Support\Facades\DB;
-use App\Models\Component;
+use App\Models\Component; // <-- 1. THIS IS ADDED
 
 class DashboardController extends Controller
 {
@@ -54,8 +54,8 @@ class DashboardController extends Controller
         $customDesigns = $user->customDesigns()
                                 ->orderBy('created_at', 'desc')
                                 ->get();
-
-        // --- ADDED: Get all components for the design preview modal ---
+        
+        // --- 2. THIS LINE IS ADDED ---
         $allComponents = Component::all()->keyBy('id');
 
 
@@ -65,7 +65,7 @@ class DashboardController extends Controller
             'activities' => $activities, 
             'customDesigns' => $customDesigns,
             'activeStatusFilter' => $statusFilter,
-            'allComponents' => $allComponents // <-- ADDED THIS VARIABLE
+            'allComponents' => $allComponents // <-- 3. THIS VARIABLE IS ADDED
         ]);
     }
 

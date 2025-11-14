@@ -44,6 +44,18 @@
                     @endforeach
                 </div>
 
+                @if(in_array($order->order_status, ['pending', 'processing']))
+                <div class="border-t border-neutral mt-6 pt-6 text-right">
+                    <form action="{{ route('order.cancel', $order) }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
+                        @csrf
+                        <button type-="submit" class="py-2 px-6 font-poppins font-semibold card-radius text-white bg-red-500 hover:bg-red-600 transition-default">
+                            Cancel Order
+                        </button>
+                    </form>
+                </div>
+                @endif
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8 py-6">
                     
                     @if($order->payment_method == 'cod')
